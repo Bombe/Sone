@@ -90,8 +90,8 @@ class EditImageAjaxPageTest : JsonPageTest("editImage.ajax") {
 	fun `request with title and description returns correct values`() {
 		val sone = mock<Sone>().apply { whenever(isLocal).thenReturn(true) }
 		val image = ImageImpl("image-id").modify().setSone(sone).update()
-		val parsed = Object()
-		val shortened = Object()
+		val parsed = Any()
+		val shortened = Any()
 		val rendered = "rendered description"
 		whenever(parserFilter.format(any(), eq("some KSK@foo link"), any())).thenReturn(parsed)
 		whenever(shortenFilter.format(any(), eq(parsed), any())).thenReturn(shortened)

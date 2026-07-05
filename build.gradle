@@ -1,8 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '2.0.20'
-    id 'org.jetbrains.kotlin.plugin.noarg' version '2.0.20'
+    id 'org.jetbrains.kotlin.jvm' version '2.4.0'
+    id 'org.jetbrains.kotlin.plugin.noarg' version '2.4.0'
     id 'info.solidsoft.pitest' version '1.7.4'
     id 'jacoco'
 }
@@ -27,7 +27,6 @@ tasks.withType(JavaCompile) {
 tasks.withType(KotlinCompile) {
     kotlinOptions {
         jvmTarget = "1.8"
-        freeCompilerArgs += '-Xjvm-default=all'
     }
 }
 

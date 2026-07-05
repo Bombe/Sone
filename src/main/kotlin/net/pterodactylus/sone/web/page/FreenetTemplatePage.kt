@@ -21,7 +21,6 @@ import freenet.clients.http.*
 import net.pterodactylus.sone.main.*
 import net.pterodactylus.util.template.*
 import net.pterodactylus.util.web.*
-import java.lang.String.*
 import java.net.*
 import java.util.logging.*
 import java.util.logging.Logger.*
@@ -83,7 +82,7 @@ open class FreenetTemplatePage(
 				processTemplate(request, templateContext)
 			}.also {
 				val finish = System.nanoTime()
-				logger.log(Level.FINEST, format("Template was rendered in %.2fms.", (finish - start) / 1000000.0))
+				logger.log(Level.FINEST, "Template was rendered in %.2fms.".format((finish - start) / 1000000.0))
 			}
 		} catch (re1: RedirectException) {
 			return RedirectResponse(re1.target ?: "")
@@ -102,7 +101,7 @@ open class FreenetTemplatePage(
 			throw RedirectException(target)
 
 	class RedirectException(val target: String?) : Exception() {
-		override fun toString(): String = format("RedirectException{target='%s'}", target)
+		override fun toString(): String = "RedirectException{target='%s'}".format(target)
 	}
 
 }
