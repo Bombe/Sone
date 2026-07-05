@@ -227,7 +227,7 @@ class SonePluginTest {
 			mutableMapOf<Pair<TypeLiteral<*>, Annotation?>, Any>()
 
 	private val injector = mock<Injector>().apply {
-		fun mockValue(clazz: Class<*>) = false.takeIf { clazz.name == java.lang.Boolean::class.java.name } ?: mock(clazz)
+		fun mockValue(clazz: Class<*>) = false.takeIf { clazz.name == Boolean::class.javaObjectType.name } ?: mock(clazz)
 		whenever(getInstance(any<Key<*>>())).then {
 			injected.getOrPut((it.getArgument(0) as Key<*>).let { it.typeLiteral to it.annotation }) {
 				it.getArgument<Key<*>>(0).typeLiteral.type.typeName.toClass().let(::mockValue)
