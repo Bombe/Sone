@@ -16,8 +16,6 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.SoneOptions;
 import net.pterodactylus.sone.freenet.wot.Identity;
 
-import freenet.keys.FreenetURI;
-
 import com.google.common.base.Objects;
 
 /**
@@ -45,11 +43,6 @@ public class IdOnlySone implements Sone {
 	@Override
 	public boolean isLocal() {
 		return false;
-	}
-
-	@Override
-	public FreenetURI getRequestUri() {
-		return null;
 	}
 
 	@Override
@@ -216,11 +209,6 @@ public class IdOnlySone implements Sone {
 
 	@Override
 	public void setOptions(SoneOptions options) {
-	}
-
-	@Override
-	public int compareTo(Sone o) {
-		return 0;
 	}
 
 	@Override
