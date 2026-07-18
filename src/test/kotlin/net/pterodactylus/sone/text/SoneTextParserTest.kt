@@ -330,15 +330,21 @@ class SoneTextParserTest {
 	}
 
 	@Test
-	fun `colon is not considered to be a part of the link`() {
+	fun `colon is considered to be a part of the link`() {
 		val parts = soneTextParser.parse("Some text (and a link: http://example.sone/abc_(def):foo.jpg) – nice!", null)
-		assertThat("Part Text", convertText(parts, PlainTextPart::class.java, LinkPart::class.java), equalTo("Some text (and a link: [http://example.sone/abc_(def)|http://example.sone/abc_(def)|example.sone/abc_(def)]:foo.jpg) – nice!"))
+		assertThat("Part Text", convertText(parts, PlainTextPart::class.java, LinkPart::class.java), equalTo("Some text (and a link: [http://example.sone/abc_(def):foo.jpg|http://example.sone/abc_(def):foo.jpg|example.sone/abc_(def):foo.jpg]) – nice!"))
 	}
 
 	@Test
 	fun `punctuation is ignored at end of link before whitespace`() {
 		val parts = soneTextParser.parse("Some text and a link: http://example.sone/abc. Nice!", null)
 		assertThat("Part Text", convertText(parts, PlainTextPart::class.java, LinkPart::class.java), equalTo("Some text and a link: [http://example.sone/abc|http://example.sone/abc|example.sone/abc]. Nice!"))
+	}
+
+	@Test
+	fun `colon is ignored at end of link before whitespace`() {
+		val parts = soneTextParser.parse("Some text and a link: http://example.sone/abc: Nice!", null)
+		assertThat("Part Text", convertText(parts, PlainTextPart::class.java, LinkPart::class.java), equalTo("Some text and a link: [http://example.sone/abc|http://example.sone/abc|example.sone/abc]: Nice!"))
 	}
 
 	@Test
