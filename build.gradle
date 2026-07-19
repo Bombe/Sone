@@ -60,6 +60,8 @@ dependencies {
     testImplementation group: 'org.jetbrains.kotlin', name: 'kotlin-test-junit'
     testImplementation group: 'junit', name: 'junit', version: '4.13.2'
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
+    // override byte-buddy version from mockito with something newer that can handle Java 21+
+    testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.14.19'
     testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '3.0'
 }
 
@@ -106,7 +108,7 @@ javadoc {
 }
 
 jacoco {
-    toolVersion = '0.8.8'
+    toolVersion = '0.8.15'
 }
 
 jacocoTestReport {
