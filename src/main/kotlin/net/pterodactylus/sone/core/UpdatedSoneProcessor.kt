@@ -17,6 +17,9 @@ import jakarta.inject.Inject
 @ImplementedBy(DefaultUpdateSoneProcessor::class)
 interface UpdatedSoneProcessor {
 
+	var postFilter: (post: Post) -> Boolean
+	var postReplyFilter: (postReply: PostReply) -> Boolean
+
 	fun updateSone(sone: Sone)
 
 }
@@ -26,12 +29,17 @@ abstract class BasicUpdateSoneProcessor(private val database: Database, private 
 
 	private val logger = Logger.getLogger(UpdatedSoneProcessor::class.qualifiedName)!!
 
+	override var postFilter: (post: Post) -> Boolean = { _ -> true }
+	override var postReplyFilter: (postReply: PostReply) -> Boolean = { _ -> true }
+
 	override fun updateSone(sone: Sone) {
 		val storedSone = database.getSone(sone.id) ?: return
 		if (!soneCanBeUpdated(storedSone, sone)) {
 			logger.fine("Downloaded Sone $sone can not update stored Sone $storedSone.")
 			return
 		}
+		sone.setPosts(sone.posts.filter(postFilter))
+		sone.setReplies(sone.replies.filter(postReplyFilter))
 
 		SoneComparison(storedSone, sone).apply {
 			newPosts

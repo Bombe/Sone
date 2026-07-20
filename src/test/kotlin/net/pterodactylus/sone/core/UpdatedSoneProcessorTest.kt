@@ -8,8 +8,10 @@ import net.pterodactylus.sone.core.event.PostReplyRemovedEvent
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.PostReply
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.data.SoneOptions.DefaultSoneOptions
 import net.pterodactylus.sone.database.Database
 import net.pterodactylus.sone.test.argumentCaptor
+import net.pterodactylus.sone.test.createRemoteSone
 import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.isProvidedByMock
 import net.pterodactylus.sone.test.mock
@@ -145,6 +147,26 @@ class UpdatedSoneProcessorTest {
 	fun `updated sone processor stores sone in database`() {
 		updatedSoneProcessor.updateSone(newSone)
 		verify(database).storeSone(newSone)
+	}
+
+	@Test
+	fun `updated Sone processor only stores posts that match the post filter`() {
+		whenever(storedSone.posts).thenReturn(emptyList<Post>())
+		whenever(storedSone.options).thenReturn(DefaultSoneOptions())
+		updatedSoneProcessor.postFilter = { post -> post.time > 2500 }
+		val newSone = createRemoteSone("sone", posts = posts, time = 9999)
+		updatedSoneProcessor.updateSone(newSone)
+		assertThat(newSone.posts, contains(posts[2]))
+	}
+
+	@Test
+	fun `updated Sone processor only stores post replies that match the post reply filter`() {
+		whenever(storedSone.posts).thenReturn(emptyList<Post>())
+		whenever(storedSone.options).thenReturn(DefaultSoneOptions())
+		updatedSoneProcessor.postReplyFilter = { postReply -> postReply.time > 2500 }
+		val newSone = createRemoteSone("sone", postReplies = postReplies.toSet(), time = 9999)
+		updatedSoneProcessor.updateSone(newSone)
+		assertThat(newSone.replies, contains(postReplies[2]))
 	}
 
 	@Test
