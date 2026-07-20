@@ -20,6 +20,7 @@ import net.pterodactylus.sone.web.baseInjector
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.containsInAnyOrder
+import org.hamcrest.Matchers.hasItem
 import org.hamcrest.Matchers.not
 import org.hamcrest.Matchers.notNullValue
 import org.junit.Before
@@ -140,7 +141,7 @@ class UpdatedSoneProcessorTest {
 		whenever(postReplies[2].isKnown).thenReturn(true)
 		updatedSoneProcessor.updateSone(newSone)
 		verify(eventBus, atLeastOnce()).post(events.capture())
-		assertThat(events.allValues, not(contains<Any>(NewPostReplyFoundEvent(postReplies[2]))))
+		assertThat(events.allValues, not(hasItem(NewPostReplyFoundEvent(postReplies[2]))))
 	}
 
 	@Test
