@@ -29,10 +29,15 @@ class PreferencesLoaderTest {
 		setupBooleanValue("ActivateFcpInterface", true)
 		setupIntValue("FcpFullAccessRequired", 1)
 		setupBooleanValue("StrictFiltering", true)
+		setupLongValue("MaxAgeOfPostsToLoad", 123)
 	}
 
 	private fun setupIntValue(optionName: String, value: Int) {
 		configuration.getIntValue("Option/$optionName").value = value
+	}
+
+	private fun setupLongValue(optionName: String, value: Long) {
+		configuration.getLongValue("Option/$optionName").value = value
 	}
 
 	private fun setupBooleanValue(optionName: String, value: Boolean) {
@@ -51,6 +56,13 @@ class PreferencesLoaderTest {
 		assertThat(preferences.fcpInterfaceActive, equalTo(true))
 		assertThat(preferences.fcpFullAccessRequired, equalTo(FullAccessRequired.WRITING))
 		assertThat(preferences.strictFiltering, equalTo(true))
+		assertThat(preferences.maxAgeOfPostsToLoad, equalTo(123))
+	}
+
+	@Test
+	fun `configuration without max age of posts to load can be loaded correctly`() {
+		configuration.getLongValue("Option/MaxAgeOfPostsToLoad").value = null
+		preferencesLoader.loadFrom(configuration)
 	}
 
 	@Test
