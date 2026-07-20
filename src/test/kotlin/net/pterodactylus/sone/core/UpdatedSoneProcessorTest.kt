@@ -1,6 +1,8 @@
 package net.pterodactylus.sone.core
 
 import com.google.common.eventbus.EventBus
+import java.util.concurrent.TimeUnit
+import net.pterodactylus.sone.core.event.MaxAgeOfPostsToLoadChangedEvent
 import net.pterodactylus.sone.core.event.NewPostFoundEvent
 import net.pterodactylus.sone.core.event.NewPostReplyFoundEvent
 import net.pterodactylus.sone.core.event.PostRemovedEvent
@@ -168,6 +170,30 @@ class UpdatedSoneProcessorTest {
 		val newSone = createRemoteSone("sone", postReplies = postReplies.toSet(), time = 9999)
 		updatedSoneProcessor.updateSone(newSone)
 		assertThat(newSone.replies, contains(postReplies[2]))
+	}
+
+	@Test
+	fun `updated Sone processor sets post filter when max age of posts to load is updated`() {
+		whenever(storedSone.posts).thenReturn(emptyList<Post>())
+		whenever(storedSone.options).thenReturn(DefaultSoneOptions())
+		val now = System.currentTimeMillis()
+		posts.forEachIndexed { index, post -> whenever(post.time).thenReturn(now - TimeUnit.DAYS.toMillis(index.toLong() + 1) + TimeUnit.HOURS.toMillis(12)) }
+		updatedSoneProcessor.maxAgeOfPostsToLoadChanged(MaxAgeOfPostsToLoadChangedEvent(2))
+		val newSone = createRemoteSone("sone", posts = posts, time = 9999)
+		updatedSoneProcessor.updateSone(newSone)
+		assertThat(newSone.posts, contains(posts[0], posts[1]))
+	}
+
+	@Test
+	fun `updated Sone processor sets post reply filter when max age of posts to load is updated`() {
+		whenever(storedSone.posts).thenReturn(emptyList<Post>())
+		whenever(storedSone.options).thenReturn(DefaultSoneOptions())
+		val now = System.currentTimeMillis()
+		postReplies.forEachIndexed { index, postReply -> whenever(postReply.time).thenReturn(now - TimeUnit.DAYS.toMillis(index.toLong() + 1) + TimeUnit.HOURS.toMillis(12)) }
+		updatedSoneProcessor.maxAgeOfPostsToLoadChanged(MaxAgeOfPostsToLoadChangedEvent(2))
+		val newSone = createRemoteSone("sone", postReplies = postReplies.toSet(), time = 9999)
+		updatedSoneProcessor.updateSone(newSone)
+		assertThat(newSone.replies, contains(postReplies[0], postReplies[1]))
 	}
 
 	@Test

@@ -9,6 +9,7 @@ import net.pterodactylus.sone.database.*
 import net.pterodactylus.sone.utils.*
 import java.util.logging.Logger
 import jakarta.inject.Inject
+import java.util.concurrent.TimeUnit.DAYS
 
 /**
  * An `UpdatedSoneProcessor` is called to process a [Sone] after it has been
@@ -66,6 +67,12 @@ abstract class BasicUpdateSoneProcessor(private val database: Database, private 
 	protected abstract fun soneCanBeUpdated(storedSone: Sone, newSone: Sone): Boolean
 
 	private val Sone.followingTime get() = database.getFollowingTime(id) ?: 0
+
+	@Subscribe
+	fun maxAgeOfPostsToLoadChanged(maxAgeOfPostsToLoadChangedEvent: MaxAgeOfPostsToLoadChangedEvent) {
+		postFilter = { post -> post.time > System.currentTimeMillis() - DAYS.toMillis(maxAgeOfPostsToLoadChangedEvent.newMaxAgeOfPostsToLoad.toLong()) }
+		postReplyFilter = { postReply -> postReply.time > System.currentTimeMillis() - DAYS.toMillis(maxAgeOfPostsToLoadChangedEvent.newMaxAgeOfPostsToLoad.toLong()) }
+	}
 
 }
 
