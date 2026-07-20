@@ -38,8 +38,8 @@ class UpdatedSoneProcessorTest {
 	private val updatedSoneProcessor = DefaultUpdateSoneProcessor(database, eventBus)
 	private val storedSone = mock<Sone>()
 	private val newSone = mock<Sone>()
-	private val posts = listOf(mock<Post>(), mock(), mock())
-	private val postReplies = listOf(mock<PostReply>(), mock(), mock())
+	private val posts = listOf(mock<Post>("Post 0"), mock("Post 1"), mock("Post 2"))
+	private val postReplies = listOf(mock<PostReply>("PostReply 0"), mock("PostReply 1"), mock("PostReply 2"))
 
 	private val events = argumentCaptor<Any>()
 
