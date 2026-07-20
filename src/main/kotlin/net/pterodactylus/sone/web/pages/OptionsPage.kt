@@ -52,6 +52,7 @@ class OptionsPage @Inject constructor(webInterface: WebInterface, loaders: Loade
 			val imagesPerPage = soneRequest.parameters["images-per-page"]?.toIntOrNull()
 			val insertionDelay = soneRequest.parameters["insertion-delay"]?.toIntOrNull()
 			val fcpFullAccessRequired = soneRequest.parameters["fcp-full-access-required"]?.toIntOrNull()
+			val maxAgeOfPostsToLoad = soneRequest.parameters["max-age-of-posts-to-load"]?.toIntOrNull()
 
 			if (cantSetOption { soneRequest.core.preferences.newPostsPerPage = postsPerPage }) fieldsWithErrors += "posts-per-page"
 			if (cantSetOption { soneRequest.core.preferences.newCharactersPerPost = charactersPerPost }) fieldsWithErrors += "characters-per-post"
@@ -59,6 +60,7 @@ class OptionsPage @Inject constructor(webInterface: WebInterface, loaders: Loade
 			if (cantSetOption { soneRequest.core.preferences.newImagesPerPage = imagesPerPage }) fieldsWithErrors += "images-per-page"
 			if (cantSetOption { soneRequest.core.preferences.newInsertionDelay = insertionDelay }) fieldsWithErrors += "insertion-delay"
 			fcpFullAccessRequired?.also { if (cantSetOption { soneRequest.core.preferences.newFcpFullAccessRequired = FullAccessRequired.values()[fcpFullAccessRequired] }) fieldsWithErrors += "fcp-full-access-required" }
+			if (cantSetOption { soneRequest.core.preferences.newMaxAgeOfPostsToLoad = maxAgeOfPostsToLoad }) fieldsWithErrors += "max-age-of-posts-to-load"
 
 			if (fieldsWithErrors.isEmpty()) {
 				soneRequest.core.touchConfiguration()
@@ -85,6 +87,7 @@ class OptionsPage @Inject constructor(webInterface: WebInterface, loaders: Loade
 			templateContext["post-cut-off-length"] = preferences.postCutOffLength
 			templateContext["posts-per-page"] = preferences.postsPerPage
 			templateContext["strict-filtering"] = preferences.strictFiltering
+			templateContext["max-age-of-posts-to-load"] = preferences.maxAgeOfPostsToLoad
 		}
 	}
 
