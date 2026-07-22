@@ -38,7 +38,7 @@ Now when you select *Sone* from the menu you will be faced with the information 
 
 ### Configuring Sone
 
-Choose *Sone → Options* from the menu and see through the list of options. You might want to to activate the “automatically follow new Sones” options so that your post feed does not look so empty. You can also choose to be notified for new Sones, posts, and replies.
+Choose *Sone → Options* from the menu and see through the list of options. You might want to activate the “automatically follow new Sones” options so that your post feed does not look so empty. You can also choose to be notified for new Sones, posts, and replies.
 
 In Sone you have the ability to upload a custom avatar for your identity. However, you can not force other people to see it; see the “Avatar Options” section for how the avatar display is controlled.
 
@@ -56,7 +56,7 @@ Now, a social network wouldn’t be much fun if you couldn’t talk with other p
 
 ## Advanced Topics
 
-### Addings Links to Posts/Replies
+### Adding Links to Posts/Replies
 
 When displaying posts and replies, Sone first parses the text. Special elements, such as Hyphanet URIs and Sone elements with a special syntax, are replaced with formatting that allow your browser to navigate the elements. Sone recognizes the following elements:
 
