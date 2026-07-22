@@ -1,6 +1,6 @@
-# Sone – The Social Network Plugin for Freenet
+# Sone – The Social Network Plugin for Hyphanet
 
-Sone aims to provide social network functionality for [Freenet](https://freenetproject.org/) (also here [on GitHub](https://github.com/freenet/)).
+Sone aims to provide social network functionality for [Hyphanet](https://www.hyphanet.org/) (also here [on GitHub](https://github.com/hyphanet/)).
 
 ## Compiling
 
@@ -8,21 +8,21 @@ Sone’s build process is handled by [Gradle](https://gradle.org/). Just use the
 
     # ./gradlew clean build fatJar
 
-This will resolve Sone’s dependencies, compile Sone, run all the tests, and put the file `sone-jar-with-dependencies.jar` into the `build/libs` directory. This is the file that you can load from Freenet’s plugin manager to run Sone.
+This will resolve Sone’s dependencies, compile Sone, run all the tests, and put the file `sone-jar-with-dependencies.jar` into the `build/libs` directory. This is the file that you can load from Hyphanet’s plugin manager to run Sone.
 
 ## Installing
 
 ### Prerequisites
 
-For Sone to work you will need a running Freenet node, of course. You will also need the Web of Trust plugin from the official plugins listed on your node’s plugin manager page (*Configuration → Plugins* in the menu).
+For Sone to work you will need a running Hyphanet node, of course. You will also need the Web of Trust plugin from the official plugins listed on your node’s plugin manager page (*Configuration → Plugins* in the menu).
 
 You will also need a web of trust identity to use Sone. If you do not already have a web of trust identity, select *Community* from the menu, choose “Generate” and follow the instructions on-screen until your identity has been created.
 
 ### Loading/Installing
 
-#### From Freenet
+#### From Hyphanet
 
-If you just want to run the latest version of Sone you first have to obtain the plugin key from [Sone’s homepage in Freenet](USK@nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI,DuQSUZiI~agF8c-6tjsFFGuZ8eICrzWCILB60nT8KKo,AQACAAE/sone/75/). Now head over to your node’s plugin manager which you can reach from the menu at *Configuration → Plugins*. At the bottom of the page there’s a section called “Add an Unofficial Plugin from Freenet.” Enter the key of the plugin into the text field and press the “Load” button. The plugin should then be downloaded from Freenet and started once it’s ready.
+If you just want to run the latest version of Sone you first have to obtain the plugin key from [Sone’s homepage in Hyphanet](USK@nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI,DuQSUZiI~agF8c-6tjsFFGuZ8eICrzWCILB60nT8KKo,AQACAAE/sone/75/). Now head over to your node’s plugin manager which you can reach from the menu at *Configuration → Plugins*. At the bottom of the page there’s a section called “Add an Unofficial Plugin from Freenet” *(sic)*. Enter the key of the plugin into the text field and press the “Load” button. The plugin should then be downloaded from Hyphanet and started once it’s ready.
 
 #### From Disk
 
@@ -58,8 +58,8 @@ Now, a social network wouldn’t be much fun if you couldn’t talk with other p
 
 ### Addings Links to Posts/Replies
 
-When displaying posts and replies, Sone first parses the text. Special elements, such as Freenet URIs and Sone elements with a special syntax, are replaced with formatting that allow your browser to navigate the elements. Sone recognizes the following elements:
+When displaying posts and replies, Sone first parses the text. Special elements, such as Hyphanet URIs and Sone elements with a special syntax, are replaced with formatting that allow your browser to navigate the elements. Sone recognizes the following elements:
 
-* Links to Freenet URIs are linked to as-is. Make sure to separate the URI from surrounding text by whitespace, such as space or line breaks, or interpunction, such as commas and periods.
+* Links to Hyphanet URIs are linked to as-is. Make sure to separate the URI from surrounding text by whitespace, such as space or line breaks, or punctuation, such as commas and periods.
 * Links to other Sone’s profiles are added by the prefix “sone://” followed by the ID of the Sone. It is also possible to get the link for a Sone from a post or reply by that Sone; just copy the URL behind the “[link author]” link.
 * Links to other posts are added by the prefix “post://” followed by the ID of the post. You can also find the post ID behind the “[link post]” link below a post.
