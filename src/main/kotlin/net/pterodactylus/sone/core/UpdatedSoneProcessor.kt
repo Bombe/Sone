@@ -9,6 +9,7 @@ import net.pterodactylus.sone.database.*
 import net.pterodactylus.sone.utils.*
 import java.util.logging.Logger
 import jakarta.inject.Inject
+import java.util.concurrent.TimeUnit.DAYS
 
 /**
  * An `UpdatedSoneProcessor` is called to process a [Sone] after it has been
@@ -16,6 +17,9 @@ import jakarta.inject.Inject
  */
 @ImplementedBy(DefaultUpdateSoneProcessor::class)
 interface UpdatedSoneProcessor {
+
+	var postFilter: (post: Post) -> Boolean
+	var postReplyFilter: (postReply: PostReply) -> Boolean
 
 	fun updateSone(sone: Sone)
 
@@ -26,12 +30,17 @@ abstract class BasicUpdateSoneProcessor(private val database: Database, private 
 
 	private val logger = Logger.getLogger(UpdatedSoneProcessor::class.qualifiedName)!!
 
+	override var postFilter: (post: Post) -> Boolean = { _ -> true }
+	override var postReplyFilter: (postReply: PostReply) -> Boolean = { _ -> true }
+
 	override fun updateSone(sone: Sone) {
 		val storedSone = database.getSone(sone.id) ?: return
 		if (!soneCanBeUpdated(storedSone, sone)) {
 			logger.fine("Downloaded Sone $sone can not update stored Sone $storedSone.")
 			return
 		}
+		sone.setPosts(sone.posts.filter(postFilter))
+		sone.setReplies(sone.replies.filter(postReplyFilter))
 
 		SoneComparison(storedSone, sone).apply {
 			newPosts
@@ -58,6 +67,12 @@ abstract class BasicUpdateSoneProcessor(private val database: Database, private 
 	protected abstract fun soneCanBeUpdated(storedSone: Sone, newSone: Sone): Boolean
 
 	private val Sone.followingTime get() = database.getFollowingTime(id) ?: 0
+
+	@Subscribe
+	fun maxAgeOfPostsToLoadChanged(maxAgeOfPostsToLoadChangedEvent: MaxAgeOfPostsToLoadChangedEvent) {
+		postFilter = { post -> post.time > System.currentTimeMillis() - DAYS.toMillis(maxAgeOfPostsToLoadChangedEvent.newMaxAgeOfPostsToLoad.toLong()) }
+		postReplyFilter = { postReply -> postReply.time > System.currentTimeMillis() - DAYS.toMillis(maxAgeOfPostsToLoadChangedEvent.newMaxAgeOfPostsToLoad.toLong()) }
+	}
 
 }
 

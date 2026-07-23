@@ -18,6 +18,7 @@ class PreferencesLoader(private val preferences: DefaultPreferences) {
 		loadFcpInterfaceActive(configuration)
 		loadFcpFullAccessRequired(configuration)
 		loadStrictFiltering(configuration)
+		loadMaxAgeOfPostsToLoad(configuration)
 	}
 
 	private fun loadInsertionDelay(configuration: Configuration) {
@@ -58,6 +59,10 @@ class PreferencesLoader(private val preferences: DefaultPreferences) {
 
 	private fun loadStrictFiltering(configuration: Configuration) {
 		preferences.newStrictFiltering = configuration.getBooleanValue("Option/StrictFiltering").getValue(null)
+	}
+
+	private fun loadMaxAgeOfPostsToLoad(configuration: Configuration) {
+		preferences.newMaxAgeOfPostsToLoad = configuration.getIntValue("Option/MaxAgeOfPostsToLoad").getValue(null)
 	}
 
 }

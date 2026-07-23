@@ -1,6 +1,8 @@
 package net.pterodactylus.sone.core
 
 import com.google.common.eventbus.EventBus
+import java.util.concurrent.TimeUnit
+import net.pterodactylus.sone.core.event.MaxAgeOfPostsToLoadChangedEvent
 import net.pterodactylus.sone.core.event.NewPostFoundEvent
 import net.pterodactylus.sone.core.event.NewPostReplyFoundEvent
 import net.pterodactylus.sone.core.event.PostRemovedEvent
@@ -8,8 +10,10 @@ import net.pterodactylus.sone.core.event.PostReplyRemovedEvent
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.PostReply
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.data.SoneOptions.DefaultSoneOptions
 import net.pterodactylus.sone.database.Database
 import net.pterodactylus.sone.test.argumentCaptor
+import net.pterodactylus.sone.test.createRemoteSone
 import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.isProvidedByMock
 import net.pterodactylus.sone.test.mock
@@ -18,6 +22,7 @@ import net.pterodactylus.sone.web.baseInjector
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.containsInAnyOrder
+import org.hamcrest.Matchers.hasItem
 import org.hamcrest.Matchers.not
 import org.hamcrest.Matchers.notNullValue
 import org.junit.Before
@@ -38,8 +43,8 @@ class UpdatedSoneProcessorTest {
 	private val updatedSoneProcessor = DefaultUpdateSoneProcessor(database, eventBus)
 	private val storedSone = mock<Sone>()
 	private val newSone = mock<Sone>()
-	private val posts = listOf(mock<Post>(), mock(), mock())
-	private val postReplies = listOf(mock<PostReply>(), mock(), mock())
+	private val posts = listOf(mock<Post>("Post 0"), mock("Post 1"), mock("Post 2"))
+	private val postReplies = listOf(mock<PostReply>("PostReply 0"), mock("PostReply 1"), mock("PostReply 2"))
 
 	private val events = argumentCaptor<Any>()
 
@@ -138,13 +143,57 @@ class UpdatedSoneProcessorTest {
 		whenever(postReplies[2].isKnown).thenReturn(true)
 		updatedSoneProcessor.updateSone(newSone)
 		verify(eventBus, atLeastOnce()).post(events.capture())
-		assertThat(events.allValues, not(contains<Any>(NewPostReplyFoundEvent(postReplies[2]))))
+		assertThat(events.allValues, not(hasItem(NewPostReplyFoundEvent(postReplies[2]))))
 	}
 
 	@Test
 	fun `updated sone processor stores sone in database`() {
 		updatedSoneProcessor.updateSone(newSone)
 		verify(database).storeSone(newSone)
+	}
+
+	@Test
+	fun `updated Sone processor only stores posts that match the post filter`() {
+		whenever(storedSone.posts).thenReturn(emptyList<Post>())
+		whenever(storedSone.options).thenReturn(DefaultSoneOptions())
+		updatedSoneProcessor.postFilter = { post -> post.time > 2500 }
+		val newSone = createRemoteSone("sone", posts = posts, time = 9999)
+		updatedSoneProcessor.updateSone(newSone)
+		assertThat(newSone.posts, contains(posts[2]))
+	}
+
+	@Test
+	fun `updated Sone processor only stores post replies that match the post reply filter`() {
+		whenever(storedSone.posts).thenReturn(emptyList<Post>())
+		whenever(storedSone.options).thenReturn(DefaultSoneOptions())
+		updatedSoneProcessor.postReplyFilter = { postReply -> postReply.time > 2500 }
+		val newSone = createRemoteSone("sone", postReplies = postReplies.toSet(), time = 9999)
+		updatedSoneProcessor.updateSone(newSone)
+		assertThat(newSone.replies, contains(postReplies[2]))
+	}
+
+	@Test
+	fun `updated Sone processor sets post filter when max age of posts to load is updated`() {
+		whenever(storedSone.posts).thenReturn(emptyList<Post>())
+		whenever(storedSone.options).thenReturn(DefaultSoneOptions())
+		val now = System.currentTimeMillis()
+		posts.forEachIndexed { index, post -> whenever(post.time).thenReturn(now - TimeUnit.DAYS.toMillis(index.toLong() + 1) + TimeUnit.HOURS.toMillis(12)) }
+		updatedSoneProcessor.maxAgeOfPostsToLoadChanged(MaxAgeOfPostsToLoadChangedEvent(2))
+		val newSone = createRemoteSone("sone", posts = posts, time = 9999)
+		updatedSoneProcessor.updateSone(newSone)
+		assertThat(newSone.posts, contains(posts[0], posts[1]))
+	}
+
+	@Test
+	fun `updated Sone processor sets post reply filter when max age of posts to load is updated`() {
+		whenever(storedSone.posts).thenReturn(emptyList<Post>())
+		whenever(storedSone.options).thenReturn(DefaultSoneOptions())
+		val now = System.currentTimeMillis()
+		postReplies.forEachIndexed { index, postReply -> whenever(postReply.time).thenReturn(now - TimeUnit.DAYS.toMillis(index.toLong() + 1) + TimeUnit.HOURS.toMillis(12)) }
+		updatedSoneProcessor.maxAgeOfPostsToLoadChanged(MaxAgeOfPostsToLoadChangedEvent(2))
+		val newSone = createRemoteSone("sone", postReplies = postReplies.toSet(), time = 9999)
+		updatedSoneProcessor.updateSone(newSone)
+		assertThat(newSone.replies, contains(postReplies[0], postReplies[1]))
 	}
 
 	@Test

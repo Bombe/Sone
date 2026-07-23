@@ -3,6 +3,7 @@ package net.pterodactylus.sone.core
 import com.google.common.eventbus.EventBus
 import com.google.common.eventbus.Subscribe
 import net.pterodactylus.sone.core.event.InsertionDelayChangedEvent
+import net.pterodactylus.sone.core.event.MaxAgeOfPostsToLoadChangedEvent
 import net.pterodactylus.sone.core.event.StrictFilteringActivatedEvent
 import net.pterodactylus.sone.core.event.StrictFilteringDeactivatedEvent
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired
@@ -12,10 +13,12 @@ import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.WRITING
 import net.pterodactylus.sone.fcp.event.FcpInterfaceActivatedEvent
 import net.pterodactylus.sone.fcp.event.FcpInterfaceDeactivatedEvent
 import net.pterodactylus.sone.fcp.event.FullAccessRequiredChanged
+import net.pterodactylus.sone.test.assertThrows
 import net.pterodactylus.util.config.Configuration
 import net.pterodactylus.util.config.MapConfigurationBackend
 import org.hamcrest.Matcher
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers
 import org.hamcrest.Matchers.emptyIterable
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.hasItem
@@ -339,6 +342,56 @@ class DefaultPreferencesTest {
 	fun `deactivated strict filtering is saved as false`() {
 		preferences.newStrictFiltering = false
 		verifySavedOption(equalTo(false)) { it.getBooleanValue("Option/StrictFiltering").value }
+	}
+
+	@Test
+	fun `default max age of posts to load is 365 days`() {
+		assertThat(preferences.maxAgeOfPostsToLoad, equalTo(365))
+	}
+
+	@Test
+	fun `max age of posts to load value is retained`() {
+		preferences.newMaxAgeOfPostsToLoad = 30
+		assertThat(preferences.maxAgeOfPostsToLoad, equalTo(30))
+	}
+
+	@Test
+	fun `max age of posts cannot be set to negative duration`() {
+		assertThrows<IllegalArgumentException> { preferences.newMaxAgeOfPostsToLoad = -1 }
+	}
+
+	@Test
+	fun `setting max age of posts to load sends event`() {
+		val events = mutableListOf<MaxAgeOfPostsToLoadChangedEvent>()
+		eventBus.register(object {
+			@Subscribe fun maxAgeOfPostsToLoadChangedEvent(event: MaxAgeOfPostsToLoadChangedEvent) =
+				events.add(event)
+		})
+		preferences.newMaxAgeOfPostsToLoad = 30
+		assertThat(events, Matchers.contains(MaxAgeOfPostsToLoadChangedEvent(30)))
+	}
+
+	@Test
+	fun `setting max age of posts to load to null restores default value`() {
+		preferences.newMaxAgeOfPostsToLoad = 30
+		preferences.newMaxAgeOfPostsToLoad = null
+		assertThat(preferences.maxAgeOfPostsToLoad, equalTo(365))
+	}
+
+	@Test
+	fun `getting value from max age of posts to load setter is unsupported`() {
+		assertThrows<UnsupportedOperationException> { preferences.newMaxAgeOfPostsToLoad }
+	}
+
+	@Test
+	fun `default max age of posts to load is stored as null`() {
+		verifySavedOption(nullValue()) { it.getIntValue("Option/MaxAgeOfPostsToLoad").getValue(null) }
+	}
+
+	@Test
+	fun `custom max age of posts to load is stored as millis`() {
+		preferences.newMaxAgeOfPostsToLoad = 30
+		verifySavedOption(equalTo(30)) { it.getIntValue("Option/MaxAgeOfPostsToLoad").value }
 	}
 
 	private fun <T> verifySavedOption(matcher: Matcher<T>, getter: (Configuration) -> T) {

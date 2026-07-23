@@ -68,8 +68,21 @@ fun createLocalSone(id: String = createId(), identity: Identity = createOwnIdent
 	override fun hasFriend(friendSoneId: String) = friendSoneId in friends
 }
 
-fun createRemoteSone(id: String = createId(), identity: Identity = createIdentity(id)): Sone = object : IdOnlySone(id) {
+fun createRemoteSone(id: String = createId(), identity: Identity = createIdentity(id), posts: List<Post> = emptyList(), postReplies: Set<PostReply> = emptySet(), time: Long = 0): Sone = object : IdOnlySone(id) {
+	private var posts = posts.toMutableList()
+	private var postReplies = postReplies.toMutableSet()
+	override fun getTime() = time
 	override fun getIdentity(): Identity = identity
+	override fun getPosts() = this.posts
+	override fun setPosts(posts: Collection<Post>) = this.apply {
+		this.posts.clear()
+		this.posts.addAll(posts)
+	}
+	override fun getReplies() = this.postReplies
+	override fun setReplies(replies: Collection<PostReply>) = apply {
+		this.postReplies.clear()
+		this.postReplies.addAll(replies)
+	}
 }
 
 fun createPost(text: String = "text", sone: Sone? = remoteSone1, known: Boolean = false, time: Long = 1, loaded: Boolean = true, recipient: Sone? = null, id: String = UUID.randomUUID().toString()): Post {
