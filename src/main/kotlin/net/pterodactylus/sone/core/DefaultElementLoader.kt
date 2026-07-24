@@ -32,10 +32,12 @@ class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticke
 		override fun shouldCancel(uri: FreenetURI, mimeType: String, size: Long): Boolean {
 			if (size > 2097152) {
 				logger.fine { "Canceling download of $uri because it’s > 2 MiB." }
+				rejectedElements += uri.toString() to RejectionReason.SizeTooLarge
 				return true
 			}
 			if (!mimeType.startsWith("image/") && !mimeType.startsWith("text/html")) {
 				logger.fine { "Canceling download of $uri because of its MIME type, $mimeType." }
+				rejectedElements += uri.toString() to RejectionReason.InvalidMediaType
 				return true
 			}
 			return false
@@ -101,6 +103,25 @@ class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticke
 			}
 		}
 		return LinkedElement(link, loading = true)
+	}
+
+	val loadingElements: Set<String>
+		get() = loadingLinks.asMap().keys
+
+	val loadedElements: Set<LinkedElement>
+		get() = elementCache.asMap().values.toSet()
+
+	val rejectedElements: Map<String, RejectionReason>
+		field = mutableMapOf()
+
+	val failedElements: Set<String>
+		get() = failureCache.asMap().keys
+
+	enum class RejectionReason {
+
+		InvalidMediaType,
+		SizeTooLarge,
+
 	}
 
 }
