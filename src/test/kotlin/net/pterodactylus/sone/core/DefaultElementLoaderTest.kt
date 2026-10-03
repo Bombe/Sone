@@ -10,6 +10,7 @@ import java.util.logging.Level.ALL
 import java.util.logging.LogRecord
 import java.util.logging.Logger
 import kotlin.math.min
+import net.pterodactylus.sone.core.DefaultElementLoader.Rejected
 import net.pterodactylus.sone.core.DefaultElementLoader.RejectionReason.InvalidMediaType
 import net.pterodactylus.sone.core.DefaultElementLoader.RejectionReason.SizeTooLarge
 import net.pterodactylus.sone.core.FreenetInterface.BackgroundFetchCallback
@@ -263,7 +264,7 @@ class DefaultElementLoaderTest {
 	fun `element loader exposes rejected element when media type does not match`() {
 		runWithCallback("KSK@test") { elementLoader, _, callback, _ ->
 			callback.shouldCancel(FreenetURI("KSK@test"), "application/x-test-data", 1234)
-			assertThat(elementLoader.rejectedElements, hasEntry("KSK@test", InvalidMediaType))
+			assertThat(elementLoader.rejectedElements, hasEntry("KSK@test", Rejected(InvalidMediaType, "application/x-test-data")))
 		}
 	}
 
@@ -271,7 +272,7 @@ class DefaultElementLoaderTest {
 	fun `element loader exposes rejected element when data is too large`() {
 		runWithCallback("KSK@test") { elementLoader, _, callback, _ ->
 			callback.shouldCancel(FreenetURI("KSK@test"), "image/png", 12345678)
-			assertThat(elementLoader.rejectedElements, hasEntry("KSK@test", SizeTooLarge))
+			assertThat(elementLoader.rejectedElements, hasEntry("KSK@test", Rejected(SizeTooLarge, 12345678L)))
 		}
 	}
 
