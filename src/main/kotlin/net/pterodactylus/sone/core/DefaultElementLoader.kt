@@ -106,7 +106,7 @@ class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticke
 	}
 
 	val loadingElements: Set<String>
-		get() = loadingLinks.asMap().keys
+		get() = synchronized(loadingLinks) { loadingLinks.asMap().keys.toSet() }
 
 	val loadedElements: Set<LinkedElement>
 		get() = elementCache.asMap().values.toSet()
