@@ -1,0 +1,75 @@
+<%include include/head.html>
+
+<h1><%= Page.ElementLoader.Page.Title|l10n|html></h1>
+
+<h2><%= Page.ElementLoader.Section.LoadingElements.Title|l10n|html></h2>
+<p><%= Page.ElementLoader.Section.LoadingElements.Description|l10n|html></p>
+
+<%foreach loadingElements loadingElement>
+    <%first>
+        <ul class="loading-elements">
+    <%/first>
+            <li class="key"><a href="/<% loadingElement>"><% loadingElement></a></li>
+    <%last>
+        </ul>
+    <%/last>
+<%/foreach>
+
+<h2><%= Page.ElementLoader.Section.LoadedElements.Title|l10n|html></h2>
+<p><%= Page.ElementLoader.Section.LoadedElements.Description|l10n|html></p>
+
+<%foreach loadedElements loadedElement>
+    <%first>
+        <ul class="loaded-elements">
+    <%/first>
+            <li class="key">
+                <a href="/<% loadedElement.link>"><% loadedElement.link></a>
+                <%foreach loadedElement.properties.entries property>
+                    <%first>
+                        <ul>
+                    <%/first>
+                            <li class="property-entry">
+                                <span class="key"><% property.key></span>:
+                                <span class="value"><% property.value></span>
+                            </li>
+                    <%last>
+                        </ul>
+                    <%/last>
+                <%/foreach>
+            </li>
+    <%last>
+        </ul>
+    <%/last>
+<%/foreach>
+
+<h2><%= Page.ElementLoader.Section.RejectedElements.Title|l10n|html></h2>
+<p><%= Page.ElementLoader.Section.RejectedElements.Description|l10n|html></p>
+
+<%foreach rejectedElements rejectedElement>
+<%first>
+<ul class="rejected-elements">
+    <%/first>
+    <li class="key">
+        <a href="/<% rejectedElement.key>"><% rejectedElement.key></a>: <% rejectedElement.value.reason> (<% rejectedElement.value.data>)
+    </li>
+    <%last>
+</ul>
+<%/last>
+<%/foreach>
+
+<h2><%= Page.ElementLoader.Section.FailedElements.Title|l10n|html></h2>
+<p><%= Page.ElementLoader.Section.FailedElements.Description|l10n|html></p>
+
+<%foreach failedElements failedElement>
+<%first>
+<ul class="failed-elements">
+    <%/first>
+    <li class="key">
+        <a href="/<% failedElement>"><% failedElement></a>
+    </li>
+    <%last>
+</ul>
+<%/last>
+<%/foreach>
+
+<%include include/tail.html>
