@@ -2,6 +2,7 @@ package net.pterodactylus.sone.core
 
 import com.codahale.metrics.*
 import com.google.common.base.Optional.*
+import com.sun.net.httpserver.HttpServer
 import freenet.crypt.*
 import freenet.keys.InsertableClientSSK.*
 import net.pterodactylus.sone.data.*
@@ -14,8 +15,12 @@ import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import org.mockito.Mockito.*
 import java.lang.System.*
+import java.net.InetAddress
+import java.net.InetSocketAddress
 import java.util.concurrent.TimeUnit.*
 import kotlin.test.*
+import org.junit.Rule
+import org.junit.rules.TemporaryFolder
 
 /**
  * Unit test for [SoneParser].
@@ -414,5 +419,51 @@ class SoneParserTest {
 		val histogram = metricRegistry.histogram("sone.parse.duration")
 		assertThat(histogram.count, equalTo(1L))
 	}
+
+	@Test
+	fun `custom entities will not cause files to be included`() {
+		val fileToRead = temporaryFolder.newFile()
+		fileToRead.writeText("secret")
+		val maliciousEntityXml = """<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE sone [<!ENTITY xxe SYSTEM "file://${fileToRead.absolutePath}">]>
+<sone>
+	<protocol-version>0</protocol-version>
+	<time>1407197508000</time>
+	<profile>
+		<first-name>xxe: &xxe;</first-name>
+	</profile>
+</sone>
+"""
+		assertThat(soneParser.parseSone(sone, maliciousEntityXml.byteInputStream())!!.profile.firstName, equalTo("xxe: "))
+	}
+
+	@Test
+	fun `custom entities will not cause URLs to be included`() {
+		val httpServer = HttpServer.create(InetSocketAddress(InetAddress.getLoopbackAddress(), 0), 0)
+		httpServer.createContext("/test") { exchange ->
+			exchange.sendResponseHeaders(200, 6)
+			exchange.responseBody.write("secret".encodeToByteArray())
+		}
+		httpServer.start()
+		try {
+			val maliciousEntityXml = """<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE sone [<!ENTITY xxe SYSTEM "http://${httpServer.address.hostName}:${httpServer.address.port}/test">]>
+<sone>
+	<protocol-version>0</protocol-version>
+	<time>1407197508000</time>
+	<profile>
+		<first-name>xxe: &xxe;</first-name>
+	</profile>
+</sone>
+"""
+			assertThat(soneParser.parseSone(sone, maliciousEntityXml.byteInputStream())!!.profile.firstName, equalTo("xxe: "))
+		} finally {
+			httpServer.stop(0)
+		}
+	}
+
+	@Rule
+	@JvmField
+	val temporaryFolder: TemporaryFolder = TemporaryFolder()
 
 }
