@@ -204,9 +204,8 @@ class DefaultElementLoaderTest {
 	}
 
 	@Test
-	fun `image is not loaded again after it failed`() {
+	fun `image is marked as failed when failed-method in callback was called`() {
 		runWithCallback(IMAGE_ID) { elementLoader, _, callback, _ ->
-			elementLoader.loadElement(IMAGE_ID)
 			callback.failed(freenetURI)
 			assertThat(elementLoader.loadElement(IMAGE_ID).failed, equalTo(true))
 		}
