@@ -97,6 +97,9 @@ class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticke
 			failureCache.getIfPresent(normalizedLink)?.run {
 				return LinkedElement(link, failed = true)
 			}
+			rejectedElements[normalizedLink]?.run {
+				return LinkedElement(link, failed = true)
+			}
 			if (loadingLinks.getIfPresent(normalizedLink) == null) {
 				loadingLinks.put(normalizedLink, true)
 				freenetInterface.startFetch(FreenetURI(link), callback)

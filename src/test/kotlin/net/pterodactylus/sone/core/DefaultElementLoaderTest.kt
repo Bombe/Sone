@@ -204,6 +204,14 @@ class DefaultElementLoaderTest {
 	}
 
 	@Test
+	fun `element will not be loaded again if it was rejected`() {
+		runWithCallback(IMAGE_ID) { elementLoader, _, callback, _ ->
+			callback.shouldCancel(freenetURI, "image/test", Long.MAX_VALUE)
+			assertThat(elementLoader.loadElement(IMAGE_ID).failed, equalTo(true))
+		}
+	}
+
+	@Test
 	fun `image is marked as failed when failed-method in callback was called`() {
 		runWithCallback(IMAGE_ID) { elementLoader, _, callback, _ ->
 			callback.failed(freenetURI)
