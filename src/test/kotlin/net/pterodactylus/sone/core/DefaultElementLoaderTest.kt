@@ -301,6 +301,15 @@ class DefaultElementLoaderTest {
 		}
 	}
 
+	@Test
+	fun `element loader does not expose an element as failed if it was rejected`() {
+		runWithCallback("KSK@test") { elementLoader, _, callback, _ ->
+			callback.shouldCancel(FreenetURI("KSK@test"), "application/x-test-data", 1234)
+			callback.failed(FreenetURI("KSK@test"))
+			assertThat(elementLoader.failedElements, not(hasItem("KSK@test")))
+		}
+	}
+
 	private fun read(resource: String): ByteArray =
 		javaClass.getResourceAsStream(resource)?.use { input ->
 			ByteArrayOutputStream().use {

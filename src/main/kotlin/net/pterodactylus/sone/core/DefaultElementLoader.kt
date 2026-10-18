@@ -118,7 +118,7 @@ class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticke
 		field = mutableMapOf()
 
 	val failedElements: Set<String>
-		get() = failureCache.asMap().keys
+		get() = failureCache.asMap().keys - rejectedElements.keys
 
 	enum class RejectionReason {
 
