@@ -41,7 +41,7 @@ class DefaultElementLoaderTest {
 	@Test
 	fun `image loader starts request for link that is not known`() {
 		runWithCallback(IMAGE_ID) { _, _, _, fetchedUris ->
-			assertThat(fetchedUris, contains(freenetURI))
+			assertThat(fetchedUris(), contains(freenetURI))
 		}
 	}
 
@@ -49,7 +49,7 @@ class DefaultElementLoaderTest {
 	fun `element loader only starts request once`() {
 		runWithCallback(IMAGE_ID) { elementLoader, _, _, fetchedUris ->
 			elementLoader.loadElement(IMAGE_ID)
-			assertThat(fetchedUris, contains(freenetURI))
+			assertThat(fetchedUris(), contains(freenetURI))
 		}
 	}
 
@@ -314,7 +314,7 @@ class DefaultElementLoaderTest {
 
 }
 
-private fun runWithCallback(requestUri: String, ticker: Ticker = createTicker(), callbackAction: (elementLoader: DefaultElementLoader, linkedElement: LinkedElement, callback: BackgroundFetchCallback, fetchedUris: List<FreenetURI>) -> Unit) {
+private fun runWithCallback(requestUri: String, ticker: Ticker = createTicker(), callbackAction: (elementLoader: DefaultElementLoader, linkedElement: LinkedElement, callback: BackgroundFetchCallback, fetchedUris: () -> List<FreenetURI>) -> Unit) {
 	val fetchedUris = mutableListOf<FreenetURI>()
 	val callback = AtomicReference<BackgroundFetchCallback>()
 	val freenetInterface = overrideStartFetch { uri, backgroundFetchCallback ->
@@ -323,7 +323,7 @@ private fun runWithCallback(requestUri: String, ticker: Ticker = createTicker(),
 	}
 	val elementLoader = DefaultElementLoader(freenetInterface, ticker)
 	val linkedElement = elementLoader.loadElement(requestUri)
-	callbackAction(elementLoader, linkedElement, callback.get(), fetchedUris)
+	callbackAction(elementLoader, linkedElement, callback.get(), { fetchedUris })
 }
 
 private fun overrideStartFetch(action: (FreenetURI, BackgroundFetchCallback) -> Unit) = object : FreenetInterface(null, null, null, null, null, dummyHighLevelSimpleClientCreator) {
