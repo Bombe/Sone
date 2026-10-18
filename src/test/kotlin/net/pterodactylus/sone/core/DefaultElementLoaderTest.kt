@@ -310,6 +310,13 @@ class DefaultElementLoaderTest {
 		}
 	}
 
+	@Test
+	fun `element loader decodes and normalizes link`() {
+		runWithCallback(decomposedKey) { _, _, _, fetchedUris ->
+			assertThat(fetchedUris(), contains(FreenetURI(normalizedKey)))
+		}
+	}
+
 	private fun read(resource: String): ByteArray =
 		javaClass.getResourceAsStream(resource)?.use { input ->
 			ByteArrayOutputStream().use {

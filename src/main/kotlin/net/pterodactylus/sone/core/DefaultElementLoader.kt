@@ -50,7 +50,7 @@ class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticke
 						ByteArrayInputStream(data).use {
 							ImageIO.read(it)
 						}?.let {
-							elementCache.get(uri.toString().decode().normalize()) {
+							elementCache.get(uri.toString()) {
 								LinkedElement(uri.toString(), properties = mapOf("type" to "image", "size" to data.size, "sizeHuman" to data.size.human))
 									.apply {
 										logger.fine("Downloaded image from $link: size=${properties["size"]}.")
@@ -60,7 +60,7 @@ class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticke
 					}
 					mimeType.baseType == "text/html" -> {
 						val document = Jsoup.parse(data.toString(Charset.forName(mimeType.getParameter("charset") ?: "UTF-8")))
-						elementCache.get(uri.toString().decode().normalize()) {
+						elementCache.get(uri.toString()) {
 							LinkedElement(uri.toString(), properties = mapOf(
 									"type" to "html", "size" to data.size, "sizeHuman" to data.size.human,
 									"title" to document.title().emptyToNull,
@@ -76,14 +76,14 @@ class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticke
 		}
 
 		override fun failed(uri: FreenetURI) {
-			failureCache.put(uri.toString().decode().normalize(), true)
+			failureCache.put(uri.toString(), true)
 			removeLoadingLink(uri)
 			logger.fine { "Download failed for $uri." }
 		}
 
 		private fun removeLoadingLink(uri: FreenetURI) {
 			synchronized(loadingLinks) {
-				loadingLinks.invalidate(uri.toString().decode().normalize())
+				loadingLinks.invalidate(uri.toString())
 			}
 		}
 	}
@@ -102,7 +102,7 @@ class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticke
 			}
 			if (loadingLinks.getIfPresent(normalizedLink) == null) {
 				loadingLinks.put(normalizedLink, true)
-				freenetInterface.startFetch(FreenetURI(link), callback)
+				freenetInterface.startFetch(FreenetURI(normalizedLink), callback)
 			}
 		}
 		return LinkedElement(link, loading = true)
