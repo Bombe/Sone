@@ -23,6 +23,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import net.pterodactylus.sone.core.Core;
+import net.pterodactylus.sone.core.DefaultElementLoader;
 import net.pterodactylus.sone.core.ElementLoader;
 import net.pterodactylus.sone.core.event.*;
 import net.pterodactylus.sone.data.Sone;
@@ -292,6 +293,7 @@ public class WebInterface implements SessionProvider {
 		pageToadletRegistry.addPage(new DismissNotificationPage(this, loaders, templateRenderer));
 		pageToadletRegistry.addPage(new DebugPage(this, loaders, templateRenderer));
 		pageToadletRegistry.addDebugPage(new MetricsPage(this, loaders, templateRenderer, metricRegistry));
+		pageToadletRegistry.addDebugPage(new ElementsPage(this, loaders, templateRenderer, (DefaultElementLoader) elementLoader));
 		pageToadletRegistry.addPage(loaders.<FreenetRequest>loadStaticPage("css/", "/static/css/", "text/css"));
 		pageToadletRegistry.addPage(loaders.<FreenetRequest>loadStaticPage("javascript/", "/static/javascript/", "text/javascript"));
 		pageToadletRegistry.addPage(loaders.<FreenetRequest>loadStaticPage("images/", "/static/images/", "image/png"));

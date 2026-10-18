@@ -2,20 +2,6 @@ package net.pterodactylus.sone.core
 
 import com.google.common.base.Ticker
 import freenet.keys.FreenetURI
-import net.pterodactylus.sone.core.FreenetInterface.BackgroundFetchCallback
-import net.pterodactylus.sone.test.*
-import org.hamcrest.Description
-import org.hamcrest.Matcher
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.allOf
-import org.hamcrest.Matchers.contains
-import org.hamcrest.Matchers.containsString
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.hasEntry
-import org.hamcrest.Matchers.not
-import org.hamcrest.TypeSafeDiagnosingMatcher
-import org.junit.Rule
-import org.junit.Test
 import java.io.ByteArrayOutputStream
 import java.util.concurrent.TimeUnit.MINUTES
 import java.util.concurrent.atomic.AtomicReference
@@ -24,6 +10,30 @@ import java.util.logging.Level.ALL
 import java.util.logging.LogRecord
 import java.util.logging.Logger
 import kotlin.math.min
+import net.pterodactylus.sone.core.DefaultElementLoader.Rejected
+import net.pterodactylus.sone.core.DefaultElementLoader.RejectionReason.InvalidMediaType
+import net.pterodactylus.sone.core.DefaultElementLoader.RejectionReason.SizeTooLarge
+import net.pterodactylus.sone.core.FreenetInterface.BackgroundFetchCallback
+import net.pterodactylus.sone.test.dummyHighLevelSimpleClientCreator
+import net.pterodactylus.sone.test.everything
+import net.pterodactylus.sone.test.handleMatcher
+import net.pterodactylus.sone.test.silencedLogging
+import org.hamcrest.Description
+import org.hamcrest.Matcher
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.allOf
+import org.hamcrest.Matchers.contains
+import org.hamcrest.Matchers.containsInAnyOrder
+import org.hamcrest.Matchers.containsString
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.hasEntry
+import org.hamcrest.Matchers.hasItem
+import org.hamcrest.Matchers.hasKey
+import org.hamcrest.Matchers.hasSize
+import org.hamcrest.Matchers.not
+import org.hamcrest.TypeSafeDiagnosingMatcher
+import org.junit.Rule
+import org.junit.Test
 
 /**
  * Unit test for [DefaultElementLoaderTest].
@@ -33,7 +43,7 @@ class DefaultElementLoaderTest {
 	@Test
 	fun `image loader starts request for link that is not known`() {
 		runWithCallback(IMAGE_ID) { _, _, _, fetchedUris ->
-			assertThat(fetchedUris, contains(freenetURI))
+			assertThat(fetchedUris(), contains(freenetURI))
 		}
 	}
 
@@ -41,7 +51,7 @@ class DefaultElementLoaderTest {
 	fun `element loader only starts request once`() {
 		runWithCallback(IMAGE_ID) { elementLoader, _, _, fetchedUris ->
 			elementLoader.loadElement(IMAGE_ID)
-			assertThat(fetchedUris, contains(freenetURI))
+			assertThat(fetchedUris(), contains(freenetURI))
 		}
 	}
 
@@ -196,11 +206,27 @@ class DefaultElementLoaderTest {
 	}
 
 	@Test
-	fun `image is not loaded again after it failed`() {
+	fun `element will not be loaded again if it was rejected`() {
 		runWithCallback(IMAGE_ID) { elementLoader, _, callback, _ ->
-			elementLoader.loadElement(IMAGE_ID)
+			callback.shouldCancel(freenetURI, "image/test", Long.MAX_VALUE)
+			assertThat(elementLoader.loadElement(IMAGE_ID).failed, equalTo(true))
+		}
+	}
+
+	@Test
+	fun `image is marked as failed when failed-method in callback was called`() {
+		runWithCallback(IMAGE_ID) { elementLoader, _, callback, _ ->
 			callback.failed(freenetURI)
 			assertThat(elementLoader.loadElement(IMAGE_ID).failed, equalTo(true))
+		}
+	}
+
+	@Test
+	fun `image is not loaded again after it failed`() {
+		runWithCallback(IMAGE_ID) { elementLoader, _, callback, fetchedUris ->
+			callback.failed(freenetURI)
+			elementLoader.loadElement(IMAGE_ID)
+			assertThat(fetchedUris(), hasSize(1))
 		}
 	}
 
@@ -223,6 +249,145 @@ class DefaultElementLoaderTest {
 		}
 	}
 
+	@Test
+	fun `element loader exposes all currently loading elements`() {
+		runWithCallback("KSK@test") { elementLoader, _, _, _ ->
+			elementLoader.loadElement("KSK@test")
+			assertThat(elementLoader.loadingElements, containsInAnyOrder("KSK@test"))
+		}
+	}
+
+	@Test
+	fun `element loader exposes all currently loaded elements`() {
+		runWithCallback("KSK@test") { elementLoader, _, callback, _ ->
+			callback.loaded(FreenetURI("KSK@test"), "image/png", read("/static/images/unknown-image-0.png"))
+			assertThat(elementLoader.loadedElements, containsInAnyOrder(
+				isLinkedElement(equalTo("KSK@test"), allOf(
+					hasEntry("type", "image"), hasEntry("size", 2451), hasEntry("sizeHuman", "2 KiB"),
+				))
+			))
+		}
+	}
+
+	@Test
+	fun `element loader no longer exposes an element as loading once it has been loaded`() {
+		runWithCallback("KSK@test") { elementLoader, _, callback, _ ->
+			callback.loaded(FreenetURI("KSK@test"), "image/png", read("/static/images/unknown-image-0.png"))
+			assertThat(elementLoader.loadingElements, not(hasItem("KSK@test")))
+		}
+	}
+
+	@Test
+	fun `element loader no longer exposes an element as loading once it was loaded as text`() {
+		runWithCallback("KSK@test%20file") { elementLoader, _, callback, _ ->
+			callback.loaded(FreenetURI("KSK@test%20file"), "text/html", ByteArray(0))
+			assertThat(elementLoader.loadingElements, not(hasItem("KSK@test file")))
+		}
+	}
+
+	@Test
+	fun `element loader no longer exposes an element as loading once it was loaded as image`() {
+		runWithCallback("KSK@test%20file") { elementLoader, _, callback, _ ->
+			callback.loaded(FreenetURI("KSK@test%20file"), "image/png", read("/static/images/unknown-image-0.png"))
+			assertThat(elementLoader.loadingElements, not(hasItem("KSK@test file")))
+		}
+	}
+
+	@Test
+	fun `element loader exposes rejected element when media type does not match`() {
+		runWithCallback("KSK@test") { elementLoader, _, callback, _ ->
+			callback.shouldCancel(FreenetURI("KSK@test"), "application/x-test-data", 1234)
+			assertThat(elementLoader.rejectedElements, hasEntry("KSK@test", Rejected(InvalidMediaType, "application/x-test-data")))
+		}
+	}
+
+	@Test
+	fun `element loader exposes rejected element when data is too large`() {
+		runWithCallback("KSK@test") { elementLoader, _, callback, _ ->
+			callback.shouldCancel(FreenetURI("KSK@test"), "image/png", 12345678)
+			assertThat(elementLoader.rejectedElements, hasEntry("KSK@test", Rejected(SizeTooLarge, 12345678L)))
+		}
+	}
+
+	@Test
+	fun `element loader exposes failed element when element cannot be loaded`() {
+		runWithCallback("KSK@test") { elementLoader, _, callback, _ ->
+			callback.failed(FreenetURI("KSK@test"))
+			assertThat(elementLoader.failedElements, hasItem("KSK@test"))
+		}
+	}
+
+	@Test
+	fun `element loader does not expose an element as failed if it was rejected`() {
+		runWithCallback("KSK@test") { elementLoader, _, callback, _ ->
+			callback.shouldCancel(FreenetURI("KSK@test"), "application/x-test-data", 1234)
+			callback.failed(FreenetURI("KSK@test"))
+			assertThat(elementLoader.failedElements, not(hasItem("KSK@test")))
+		}
+	}
+
+	@Test
+	fun `element loader no longer exposes an element as loading once it has failed`() {
+		runWithCallback("KSK@test%20file") { elementLoader, _, callback, _ ->
+			callback.failed(FreenetURI("KSK@test%20file"))
+			assertThat(elementLoader.loadingElements, not(hasItem("KSK@test file")))
+		}
+	}
+
+	@Test
+	fun `element loader decodes and normalizes link`() {
+		runWithCallback(decomposedKey) { _, _, _, fetchedUris ->
+			assertThat(fetchedUris(), contains(FreenetURI(normalizedKey)))
+		}
+	}
+
+	@Test
+	fun `url of element rejected because of size is decoded`() {
+		runWithCallback("KSK@test%20file") { elementLoader, _, callback, fetchedUris ->
+			callback.shouldCancel(FreenetURI("KSK@test%20file"), "text/html", Long.MAX_VALUE)
+			assertThat(elementLoader.rejectedElements, hasKey("KSK@test file"))
+		}
+	}
+
+	@Test
+	fun `url of element rejected because of MIME type is decoded`() {
+		runWithCallback("KSK@test%20file") { elementLoader, _, callback, fetchedUris ->
+			callback.shouldCancel(FreenetURI("KSK@test%20file"), "test/data", 1L)
+			assertThat(elementLoader.rejectedElements, hasKey("KSK@test file"))
+		}
+	}
+
+	@Test
+	fun `url of element that failed to load is decoded`() {
+		runWithCallback("KSK@test%20file") { elementLoader, _, callback, fetchedUris ->
+			callback.failed(FreenetURI("KSK@test%20file"))
+			assertThat(elementLoader.failedElements, containsInAnyOrder("KSK@test file"))
+		}
+	}
+
+	@Test
+	fun `url of loading element is decoded`() {
+		runWithCallback("KSK@test%20file") { elementLoader, _, callback, fetchedUris ->
+			assertThat(elementLoader.loadingElements, containsInAnyOrder("KSK@test file"))
+		}
+	}
+
+	@Test
+	fun `url of loaded text element is decoded`() {
+		runWithCallback("KSK@test%20file") { elementLoader, _, callback, fetchedUris ->
+			callback.loaded(FreenetURI("KSK@test%20file"), "text/html", ByteArray(0))
+			assertThat(elementLoader.loadedElements, containsInAnyOrder(isLinkedElement(equalTo("KSK@test file"))))
+		}
+	}
+
+	@Test
+	fun `url of loaded image element is decoded`() {
+		runWithCallback("KSK@test%20file") { elementLoader, _, callback, fetchedUris ->
+			callback.loaded(FreenetURI("KSK@test%20file"), "image/test", read("/static/images/unknown-image-0.png"))
+			assertThat(elementLoader.loadedElements, containsInAnyOrder(isLinkedElement(equalTo("KSK@test file"))))
+		}
+	}
+
 	private fun read(resource: String): ByteArray =
 		javaClass.getResourceAsStream(resource)?.use { input ->
 			ByteArrayOutputStream().use {
@@ -239,21 +404,21 @@ class DefaultElementLoaderTest {
 	@Suppress("unused")
 	// keep this instance around so its configuration isn’t lost
 	private val logger = Logger.getLogger(DefaultElementLoader::class.qualifiedName)
-	.apply { level = ALL }
-	.apply {
-		addHandler(object : Handler() {
-			override fun publish(record: LogRecord) {
-				loggedRecords += record
-			}
+		.apply { level = ALL }
+		.apply {
+			addHandler(object : Handler() {
+				override fun publish(record: LogRecord) {
+					loggedRecords += record
+				}
 
-			override fun flush() = Unit
-			override fun close() = Unit
-		})
-	}
+				override fun flush() = Unit
+				override fun close() = Unit
+			})
+		}
 
 }
 
-private fun runWithCallback(requestUri: String, ticker: Ticker = createTicker(), callbackAction: (elementLoader: ElementLoader, linkedElement: LinkedElement, callback: BackgroundFetchCallback, fetchedUris: List<FreenetURI>) -> Unit) {
+private fun runWithCallback(requestUri: String, ticker: Ticker = createTicker(), callbackAction: (elementLoader: DefaultElementLoader, linkedElement: LinkedElement, callback: BackgroundFetchCallback, fetchedUris: () -> List<FreenetURI>) -> Unit) {
 	val fetchedUris = mutableListOf<FreenetURI>()
 	val callback = AtomicReference<BackgroundFetchCallback>()
 	val freenetInterface = overrideStartFetch { uri, backgroundFetchCallback ->
@@ -262,7 +427,7 @@ private fun runWithCallback(requestUri: String, ticker: Ticker = createTicker(),
 	}
 	val elementLoader = DefaultElementLoader(freenetInterface, ticker)
 	val linkedElement = elementLoader.loadElement(requestUri)
-	callbackAction(elementLoader, linkedElement, callback.get(), fetchedUris)
+	callbackAction(elementLoader, linkedElement, callback.get(), { fetchedUris })
 }
 
 private fun overrideStartFetch(action: (FreenetURI, BackgroundFetchCallback) -> Unit) = object : FreenetInterface(null, null, null, null, null, dummyHighLevelSimpleClientCreator) {

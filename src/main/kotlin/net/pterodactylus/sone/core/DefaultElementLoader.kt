@@ -32,10 +32,12 @@ class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticke
 		override fun shouldCancel(uri: FreenetURI, mimeType: String, size: Long): Boolean {
 			if (size > 2097152) {
 				logger.fine { "Canceling download of $uri because it’s > 2 MiB." }
+				rejectedElements[uri.toString().decode()] = Rejected(RejectionReason.SizeTooLarge, size)
 				return true
 			}
 			if (!mimeType.startsWith("image/") && !mimeType.startsWith("text/html")) {
 				logger.fine { "Canceling download of $uri because of its MIME type, $mimeType." }
+				rejectedElements[uri.toString().decode()] = Rejected(RejectionReason.InvalidMediaType, mimeType)
 				return true
 			}
 			return false
@@ -48,8 +50,8 @@ class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticke
 						ByteArrayInputStream(data).use {
 							ImageIO.read(it)
 						}?.let {
-							elementCache.get(uri.toString().decode().normalize()) {
-								LinkedElement(uri.toString(), properties = mapOf("type" to "image", "size" to data.size, "sizeHuman" to data.size.human))
+							elementCache.get(uri.toString().decode()) {
+								LinkedElement(uri.toString().decode(), properties = mapOf("type" to "image", "size" to data.size, "sizeHuman" to data.size.human))
 									.apply {
 										logger.fine("Downloaded image from $link: size=${properties["size"]}.")
 									}
@@ -58,8 +60,8 @@ class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticke
 					}
 					mimeType.baseType == "text/html" -> {
 						val document = Jsoup.parse(data.toString(Charset.forName(mimeType.getParameter("charset") ?: "UTF-8")))
-						elementCache.get(uri.toString().decode().normalize()) {
-							LinkedElement(uri.toString(), properties = mapOf(
+						elementCache.get(uri.toString().decode()) {
+							LinkedElement(uri.toString().decode(), properties = mapOf(
 									"type" to "html", "size" to data.size, "sizeHuman" to data.size.human,
 									"title" to document.title().emptyToNull,
 									"description" to (document.metaDescription ?: document.firstNonHeadingParagraph)
@@ -74,14 +76,14 @@ class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticke
 		}
 
 		override fun failed(uri: FreenetURI) {
-			failureCache.put(uri.toString().decode().normalize(), true)
+			failureCache.put(uri.toString().decode(), true)
 			removeLoadingLink(uri)
 			logger.fine { "Download failed for $uri." }
 		}
 
 		private fun removeLoadingLink(uri: FreenetURI) {
 			synchronized(loadingLinks) {
-				loadingLinks.invalidate(uri.toString().decode().normalize())
+				loadingLinks.invalidate(uri.toString().decode())
 			}
 		}
 	}
@@ -95,13 +97,37 @@ class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticke
 			failureCache.getIfPresent(normalizedLink)?.run {
 				return LinkedElement(link, failed = true)
 			}
+			rejectedElements[normalizedLink]?.run {
+				return LinkedElement(link, failed = true)
+			}
 			if (loadingLinks.getIfPresent(normalizedLink) == null) {
 				loadingLinks.put(normalizedLink, true)
-				freenetInterface.startFetch(FreenetURI(link), callback)
+				freenetInterface.startFetch(FreenetURI(normalizedLink), callback)
 			}
 		}
 		return LinkedElement(link, loading = true)
 	}
+
+	val loadingElements: Set<String>
+		get() = synchronized(loadingLinks) { loadingLinks.asMap().keys.toSet() }
+
+	val loadedElements: Set<LinkedElement>
+		get() = elementCache.asMap().values.toSet()
+
+	val rejectedElements: Map<String, Rejected>
+		field = mutableMapOf()
+
+	val failedElements: Set<String>
+		get() = failureCache.asMap().keys - rejectedElements.keys
+
+	enum class RejectionReason {
+
+		InvalidMediaType,
+		SizeTooLarge,
+
+	}
+
+	data class Rejected(val reason: RejectionReason, val data: Any)
 
 }
 

@@ -182,8 +182,9 @@ public class FreenetInterface {
 				if (meta.isArchiveManifest()) {
 					return false;
 				}
-				String mimeType = meta.getMIMEType();
-				boolean cancel = (mimeType == null) || backgroundFetchCallback.shouldCancel(uri, mimeType, meta.dataLength());
+				Metadata actualMetadata = meta.isSimpleManifest() ? meta.getDocuments().values().stream().findFirst().get() : meta;
+				String mimeType = actualMetadata.getMIMEType();
+				boolean cancel = (mimeType == null) || backgroundFetchCallback.shouldCancel(uri, mimeType, actualMetadata.dataLength());
 				if (cancel) {
 					backgroundFetchCallback.failed(uri);
 				}

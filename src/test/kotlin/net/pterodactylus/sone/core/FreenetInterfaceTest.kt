@@ -390,8 +390,21 @@ class FreenetInterfaceTest {
 	}
 
 	@Test
+	fun `request is not cancelled for image mime type in simple manifest`() {
+		verifySnoopCancelsRequestForMimeType("image/png", false, simpleManifest = true)
+		verify(backgroundFetchCallback, never()).failed(uri)
+	}
+
+	@Test
 	fun `request is cancelled for null mime type`() {
 		verifySnoopCancelsRequestForMimeType(null, true)
+		verify(backgroundFetchCallback, never()).shouldCancel(eq(uri), any(), anyLong())
+		verify(backgroundFetchCallback).failed(uri)
+	}
+
+	@Test
+	fun `request is cancelled for null mime type in simple manifest`() {
+		verifySnoopCancelsRequestForMimeType(null, true, simpleManifest = true)
 		verify(backgroundFetchCallback, never()).shouldCancel(eq(uri), any(), anyLong())
 		verify(backgroundFetchCallback).failed(uri)
 	}
@@ -403,8 +416,20 @@ class FreenetInterfaceTest {
 	}
 
 	@Test
+	fun `request is cancelled for video mime type in simple manifest`() {
+		verifySnoopCancelsRequestForMimeType("video/mkv", true, simpleManifest = true)
+		verify(backgroundFetchCallback).failed(uri)
+	}
+
+	@Test
 	fun `request is cancelled for audio mime type`() {
 		verifySnoopCancelsRequestForMimeType("audio/mpeg", true)
+		verify(backgroundFetchCallback).failed(uri)
+	}
+
+	@Test
+	fun `request is cancelled for audio mime type in simple manifest`() {
+		verifySnoopCancelsRequestForMimeType("audio/mpeg", true, simpleManifest = true)
 		verify(backgroundFetchCallback).failed(uri)
 	}
 
@@ -414,13 +439,25 @@ class FreenetInterfaceTest {
 		verify(backgroundFetchCallback).failed(uri)
 	}
 
-	private fun verifySnoopCancelsRequestForMimeType(mimeType: String?, cancel: Boolean) {
+	@Test
+	fun `request is cancelled for text mime type in simple manifest`() {
+		verifySnoopCancelsRequestForMimeType("text/plain", true, simpleManifest = true)
+		verify(backgroundFetchCallback).failed(uri)
+	}
+
+	private fun verifySnoopCancelsRequestForMimeType(mimeType: String?, cancel: Boolean, simpleManifest: Boolean = false) {
 		whenever(backgroundFetchCallback.shouldCancel(eq(uri), if (mimeType != null) eq(mimeType) else isNull(), anyLong())).thenReturn(cancel)
 		freenetInterface.startFetch(uri, backgroundFetchCallback)
 		val snoopMetadata = forClass(SnoopMetadata::class.java)
 		verify(clientGetter).metaSnoop = snoopMetadata.capture()
 		val metadata = mock<Metadata>()
-		whenever(metadata.mimeType).thenReturn(mimeType)
+		whenever(metadata.isSimpleManifest).thenReturn(simpleManifest)
+		if (simpleManifest) {
+			val innerMetadata = mock<Metadata>().also { whenever(it.mimeType).thenReturn(mimeType) }
+			whenever(metadata.documents).thenReturn(mapOf("file" to innerMetadata).let(::HashMap))
+		} else {
+			whenever(metadata.mimeType).thenReturn(mimeType)
+		}
 		assertThat(snoopMetadata.value.snoopMetadata(metadata, mock()), equalTo(cancel))
 	}
 
