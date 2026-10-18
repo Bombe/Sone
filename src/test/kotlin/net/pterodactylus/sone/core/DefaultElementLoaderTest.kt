@@ -28,6 +28,7 @@ import org.hamcrest.Matchers.containsString
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.hasEntry
 import org.hamcrest.Matchers.hasItem
+import org.hamcrest.Matchers.hasSize
 import org.hamcrest.Matchers.not
 import org.hamcrest.TypeSafeDiagnosingMatcher
 import org.junit.Rule
@@ -216,6 +217,15 @@ class DefaultElementLoaderTest {
 		runWithCallback(IMAGE_ID) { elementLoader, _, callback, _ ->
 			callback.failed(freenetURI)
 			assertThat(elementLoader.loadElement(IMAGE_ID).failed, equalTo(true))
+		}
+	}
+
+	@Test
+	fun `image is not loaded again after it failed`() {
+		runWithCallback(IMAGE_ID) { elementLoader, _, callback, fetchedUris ->
+			callback.failed(freenetURI)
+			elementLoader.loadElement(IMAGE_ID)
+			assertThat(fetchedUris(), hasSize(1))
 		}
 	}
 
