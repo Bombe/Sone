@@ -28,6 +28,7 @@ import org.hamcrest.Matchers.containsString
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.hasEntry
 import org.hamcrest.Matchers.hasItem
+import org.hamcrest.Matchers.hasKey
 import org.hamcrest.Matchers.hasSize
 import org.hamcrest.Matchers.not
 import org.hamcrest.TypeSafeDiagnosingMatcher
@@ -271,9 +272,24 @@ class DefaultElementLoaderTest {
 	@Test
 	fun `element loader no longer exposes an element as loading once it has been loaded`() {
 		runWithCallback("KSK@test") { elementLoader, _, callback, _ ->
-			elementLoader.loadElement("KSK@test")
 			callback.loaded(FreenetURI("KSK@test"), "image/png", read("/static/images/unknown-image-0.png"))
 			assertThat(elementLoader.loadingElements, not(hasItem("KSK@test")))
+		}
+	}
+
+	@Test
+	fun `element loader no longer exposes an element as loading once it was loaded as text`() {
+		runWithCallback("KSK@test%20file") { elementLoader, _, callback, _ ->
+			callback.loaded(FreenetURI("KSK@test%20file"), "text/html", ByteArray(0))
+			assertThat(elementLoader.loadingElements, not(hasItem("KSK@test file")))
+		}
+	}
+
+	@Test
+	fun `element loader no longer exposes an element as loading once it was loaded as image`() {
+		runWithCallback("KSK@test%20file") { elementLoader, _, callback, _ ->
+			callback.loaded(FreenetURI("KSK@test%20file"), "image/png", read("/static/images/unknown-image-0.png"))
+			assertThat(elementLoader.loadingElements, not(hasItem("KSK@test file")))
 		}
 	}
 
@@ -311,9 +327,64 @@ class DefaultElementLoaderTest {
 	}
 
 	@Test
+	fun `element loader no longer exposes an element as loading once it has failed`() {
+		runWithCallback("KSK@test%20file") { elementLoader, _, callback, _ ->
+			callback.failed(FreenetURI("KSK@test%20file"))
+			assertThat(elementLoader.loadingElements, not(hasItem("KSK@test file")))
+		}
+	}
+
+	@Test
 	fun `element loader decodes and normalizes link`() {
 		runWithCallback(decomposedKey) { _, _, _, fetchedUris ->
 			assertThat(fetchedUris(), contains(FreenetURI(normalizedKey)))
+		}
+	}
+
+	@Test
+	fun `url of element rejected because of size is decoded`() {
+		runWithCallback("KSK@test%20file") { elementLoader, _, callback, fetchedUris ->
+			callback.shouldCancel(FreenetURI("KSK@test%20file"), "text/html", Long.MAX_VALUE)
+			assertThat(elementLoader.rejectedElements, hasKey("KSK@test file"))
+		}
+	}
+
+	@Test
+	fun `url of element rejected because of MIME type is decoded`() {
+		runWithCallback("KSK@test%20file") { elementLoader, _, callback, fetchedUris ->
+			callback.shouldCancel(FreenetURI("KSK@test%20file"), "test/data", 1L)
+			assertThat(elementLoader.rejectedElements, hasKey("KSK@test file"))
+		}
+	}
+
+	@Test
+	fun `url of element that failed to load is decoded`() {
+		runWithCallback("KSK@test%20file") { elementLoader, _, callback, fetchedUris ->
+			callback.failed(FreenetURI("KSK@test%20file"))
+			assertThat(elementLoader.failedElements, containsInAnyOrder("KSK@test file"))
+		}
+	}
+
+	@Test
+	fun `url of loading element is decoded`() {
+		runWithCallback("KSK@test%20file") { elementLoader, _, callback, fetchedUris ->
+			assertThat(elementLoader.loadingElements, containsInAnyOrder("KSK@test file"))
+		}
+	}
+
+	@Test
+	fun `url of loaded text element is decoded`() {
+		runWithCallback("KSK@test%20file") { elementLoader, _, callback, fetchedUris ->
+			callback.loaded(FreenetURI("KSK@test%20file"), "text/html", ByteArray(0))
+			assertThat(elementLoader.loadedElements, containsInAnyOrder(isLinkedElement(equalTo("KSK@test file"))))
+		}
+	}
+
+	@Test
+	fun `url of loaded image element is decoded`() {
+		runWithCallback("KSK@test%20file") { elementLoader, _, callback, fetchedUris ->
+			callback.loaded(FreenetURI("KSK@test%20file"), "image/test", read("/static/images/unknown-image-0.png"))
+			assertThat(elementLoader.loadedElements, containsInAnyOrder(isLinkedElement(equalTo("KSK@test file"))))
 		}
 	}
 
@@ -333,17 +404,17 @@ class DefaultElementLoaderTest {
 	@Suppress("unused")
 	// keep this instance around so its configuration isn’t lost
 	private val logger = Logger.getLogger(DefaultElementLoader::class.qualifiedName)
-	.apply { level = ALL }
-	.apply {
-		addHandler(object : Handler() {
-			override fun publish(record: LogRecord) {
-				loggedRecords += record
-			}
+		.apply { level = ALL }
+		.apply {
+			addHandler(object : Handler() {
+				override fun publish(record: LogRecord) {
+					loggedRecords += record
+				}
 
-			override fun flush() = Unit
-			override fun close() = Unit
-		})
-	}
+				override fun flush() = Unit
+				override fun close() = Unit
+			})
+		}
 
 }
 
