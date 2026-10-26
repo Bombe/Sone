@@ -16,3 +16,5 @@ tasks:
   - jar: |
       cd sone
       ./gradlew fatJar
+artifacts:
+  - ./sone/build/libs/sone-jar-with-dependencies.jar
