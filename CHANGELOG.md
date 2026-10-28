@@ -5,7 +5,7 @@ All notable changes to Sone will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/2.0.0/),
 but this project does not adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [v83] – 2026-10-27
 
 The first release in over six years; many of these changes have already been running on my node for a long time, but I was always too lazy to tie it all up into a new release. Not anymore!
 
