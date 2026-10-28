@@ -81,5 +81,5 @@ class LocalReplyHandlerTest {
 
 }
 
-private val localReply = emptyPostReply(sone = localSone1)
-private val remoteReply = emptyPostReply()
+private val localReply = createPostReply(sone = localSone1)
+private val remoteReply = createPostReply()

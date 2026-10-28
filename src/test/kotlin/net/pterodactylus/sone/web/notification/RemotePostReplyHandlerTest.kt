@@ -34,7 +34,7 @@ class RemotePostReplyHandlerTest {
 
 	private val notification = ListNotification<PostReply>("", "", Template())
 	private val notificationHandlerTester = NotificationHandlerTester { RemotePostReplyHandler(it, notification) }
-	private val postReply = emptyPostReply()
+	private val postReply = createPostReply()
 
 	@Test
 	fun `reply is added to notification on new reply`() {
@@ -64,14 +64,14 @@ class RemotePostReplyHandlerTest {
 
 	@Test
 	fun `reply is not added to notification on new local reply`() {
-		val postReply = emptyPostReply(sone = localSone1)
+		val postReply = createPostReply(sone = localSone1)
 		notificationHandlerTester.sendEvent(NewPostReplyFoundEvent(postReply))
 		assertThat(notification.elements, not(hasItem<PostReply>(postReply)))
 	}
 
 	@Test
 	fun `notification is not added to manager on new local reply`() {
-		val postReply = emptyPostReply(sone = localSone1)
+		val postReply = createPostReply(sone = localSone1)
 		notificationHandlerTester.sendEvent(NewPostReplyFoundEvent(postReply))
 		assertThat(notificationHandlerTester.notifications, not(hasItem<Notification>(notification)))
 	}

@@ -23,18 +23,21 @@ import com.google.common.collect.Multimap
 import com.google.common.collect.TreeMultimap
 import com.google.common.util.concurrent.AbstractService
 import com.google.common.util.concurrent.RateLimiter
-import com.google.inject.Inject
 import com.google.inject.Singleton
+import jakarta.inject.Inject
 import net.pterodactylus.sone.data.Album
 import net.pterodactylus.sone.data.Image
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.PostReply
+import net.pterodactylus.sone.data.PostReplyShell
+import net.pterodactylus.sone.data.PostShell
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.data.allAlbums
 import net.pterodactylus.sone.data.allImages
 import net.pterodactylus.sone.data.impl.AlbumBuilderImpl
 import net.pterodactylus.sone.data.impl.ImageBuilderImpl
 import net.pterodactylus.sone.data.newestReplyFirst
+import net.pterodactylus.sone.data.toShell
 import net.pterodactylus.sone.database.AlbumBuilder
 import net.pterodactylus.sone.database.Database
 import net.pterodactylus.sone.database.DatabaseException
@@ -47,23 +50,27 @@ import net.pterodactylus.sone.utils.unit
 import net.pterodactylus.util.config.Configuration
 import net.pterodactylus.util.config.ConfigurationException
 import java.util.concurrent.locks.ReentrantReadWriteLock
+import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock
 import kotlin.concurrent.withLock
 
 /**
  * Memory-based [PostDatabase] implementation.
  */
 @Singleton
-class MemoryDatabase @Inject constructor(private val configuration: Configuration) : AbstractService(), Database {
+class MemoryDatabase constructor(private val configuration: Configuration, private val saveKnownPostRepliesRateLimiter: RateLimiter) : AbstractService(), Database {
+
+	@Inject constructor(configuration: Configuration): this(configuration, RateLimiter.create(1.0))
 
 	private val lock = ReentrantReadWriteLock()
-	private val readLock by lazy { lock.readLock()!! }
-	private val writeLock by lazy { lock.writeLock()!! }
+	private val readLock: ReadLock by lazy { lock.readLock() }
+	private val writeLock: WriteLock by lazy { lock.writeLock() }
 	private val configurationLoader = ConfigurationLoader(configuration)
 	private val allSones = mutableMapOf<String, Sone>()
-	private val allPosts = mutableMapOf<String, Post>()
-	private val sonePosts: Multimap<String, Post> = HashMultimap.create<String, Post>()
+	private val allPosts = mutableMapOf<String, PostShell>()
+	private val sonePosts: Multimap<String, PostShell> = HashMultimap.create<String, PostShell>()
 	private val knownPosts = mutableSetOf<String>()
-	private val allPostReplies = mutableMapOf<String, PostReply>()
+	private val allPostReplies = mutableMapOf<String, PostReplyShell>()
 	private val sonePostReplies: Multimap<String, PostReply> = TreeMultimap.create<String, PostReply>(Comparator { leftString, rightString -> leftString.compareTo(rightString) }, newestReplyFirst)
 	private val knownPostReplies = mutableSetOf<String>()
 	private val allAlbums = mutableMapOf<String, Album>()
@@ -74,7 +81,6 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 	private val memoryFriendDatabase = MemoryFriendDatabase(configurationLoader)
 	private val saveRateLimiter: RateLimiter = RateLimiter.create(1.0)
 	private val saveKnownPostsRateLimiter: RateLimiter = RateLimiter.create(1.0)
-	private val saveKnownPostRepliesRateLimiter: RateLimiter = RateLimiter.create(1.0)
 
 	override val soneLoader get() = this::getSone
 
@@ -117,13 +123,13 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 			removeSone(sone)
 
 			allSones[sone.id] = sone
-			sonePosts.putAll(sone.id, sone.posts)
-			for (post in sone.posts) {
+			sonePosts.putAll(sone.id, sone.posts.map(Post::toShell))
+			for (post in sone.posts.map(Post::toShell)) {
 				allPosts[post.id] = post
 			}
 			sonePostReplies.putAll(sone.id, sone.replies)
 			for (postReply in sone.replies) {
-				allPostReplies[postReply.id] = postReply
+				allPostReplies[postReply.id] = postReply.toShell()
 			}
 			sone.allAlbums.let { albums ->
 				soneAlbums.putAll(sone.id, albums)
@@ -191,17 +197,17 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 	override fun getFollowingTime(friendSoneId: String) =
 			memoryFriendDatabase.getFollowingTime(friendSoneId)
 
-	override fun getPost(postId: String) =
-			readLock.withLock { allPosts[postId] }
+	override fun getPost(postId: String): Post? =
+			readLock.withLock { allPosts[postId]?.build(newPostBuilder()) }
 
 	override fun getPosts(soneId: String): Collection<Post> =
-			sonePosts[soneId].toSet()
+			sonePosts[soneId].map { it.build(newPostBuilder()) }.toSet()
 
 	override fun getDirectedPosts(recipientId: String) =
 			readLock.withLock {
-				allPosts.values.filter {
-					it.recipientId.orNull() == recipientId
-				}
+				allPosts.values
+						.filter { it.recipientId == recipientId }
+						.map { it.build(newPostBuilder()) }
 			}
 
 	override fun newPostBuilder(): PostBuilder = MemoryPostBuilder(this, this)
@@ -209,8 +215,10 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 	override fun storePost(post: Post) {
 		checkNotNull(post, "post must not be null")
 		writeLock.withLock {
-			allPosts[post.id] = post
-			sonePosts[post.sone.id].add(post)
+			post.toShell().also { shell ->
+				allPosts[post.id] = shell
+				sonePosts[post.sone.id].add(shell)
+			}
 		}
 	}
 
@@ -218,17 +226,20 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 		checkNotNull(post, "post must not be null")
 		writeLock.withLock {
 			allPosts.remove(post.id)
-			sonePosts[post.sone.id].remove(post)
+			sonePosts[post.sone.id].remove(post.toShell())
 			post.sone.removePost(post)
 		}
 	}
 
-	override fun getPostReply(id: String) = readLock.withLock { allPostReplies[id] }
+	override fun getPostReply(id: String) = readLock.withLock {
+		allPostReplies[id]?.build(newPostReplyBuilder())
+	}
 
 	override fun getReplies(postId: String) =
 			readLock.withLock {
 				allPostReplies.values
 						.filter { it.postId == postId }
+						.map { it.build(newPostReplyBuilder()) }
 						.sortedWith(newestReplyFirst.reversed())
 			}
 
@@ -237,7 +248,7 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 
 	override fun storePostReply(postReply: PostReply) =
 			writeLock.withLock {
-				allPostReplies[postReply.id] = postReply
+				allPostReplies[postReply.id] = postReply.toShell()
 			}
 
 	override fun removePostReply(postReply: PostReply) =
@@ -286,7 +297,7 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 	override fun isPostBookmarked(post: Post) =
 			memoryBookmarkDatabase.isPostBookmarked(post)
 
-	protected fun isPostKnown(post: Post) = readLock.withLock { post.id in knownPosts }
+	internal fun isPostKnown(post: Post) = readLock.withLock { post.id in knownPosts }
 
 	fun setPostKnown(post: Post, known: Boolean): Unit =
 			writeLock.withLock {
@@ -297,7 +308,7 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 				saveKnownPosts()
 			}
 
-	protected fun isPostReplyKnown(postReply: PostReply) = readLock.withLock { postReply.id in knownPostReplies }
+	internal fun isPostReplyKnown(postReply: PostReply) = readLock.withLock { postReply.id in knownPostReplies }
 
 	override fun setPostReplyKnown(postReply: PostReply): Unit =
 			writeLock.withLock {

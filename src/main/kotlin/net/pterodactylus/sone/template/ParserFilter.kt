@@ -7,8 +7,8 @@ import net.pterodactylus.sone.text.SoneTextParser
 import net.pterodactylus.sone.text.SoneTextParserContext
 import net.pterodactylus.util.template.Filter
 import net.pterodactylus.util.template.TemplateContext
-import javax.inject.Inject
-import javax.inject.Singleton
+import jakarta.inject.Inject
+import jakarta.inject.Singleton
 
 /**
  * Parses a [String] into a number of [Part]s.

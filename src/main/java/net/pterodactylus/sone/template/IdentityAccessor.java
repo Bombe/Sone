@@ -19,8 +19,8 @@ package net.pterodactylus.sone.template;
 
 import java.util.Set;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.freenet.wot.Identity;

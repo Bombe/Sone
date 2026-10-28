@@ -24,7 +24,7 @@ import net.pterodactylus.sone.notify.*
 import net.pterodactylus.util.notify.*
 import java.util.concurrent.*
 import java.util.concurrent.atomic.*
-import javax.inject.*
+import jakarta.inject.*
 
 /**
  * Handler for [SoneLockedEvent]s and [SoneUnlockedEvent]s that can schedule notifications after

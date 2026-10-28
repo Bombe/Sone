@@ -5,7 +5,7 @@ import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.web.*
 import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.template.*
-import javax.inject.*
+import jakarta.inject.*
 
 /**
  * Logs a user out.

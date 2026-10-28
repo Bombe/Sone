@@ -7,7 +7,7 @@ import net.pterodactylus.sone.utils.*
 import net.pterodactylus.sone.web.*
 import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.template.*
-import javax.inject.*
+import jakarta.inject.*
 
 /**
  * The index page shows the main page of Sone. This page will contain the posts
@@ -26,7 +26,7 @@ class IndexPage @Inject constructor(webInterface: WebInterface, loaders: Loaders
 						.flatMap { it.posts } +
 				soneRequest.core.getDirectedPosts(currentSone.id)
 				).distinct()
-				.filter { postVisibilityFilter.isVisible(currentSone).apply(it) }
+				.filter { postVisibilityFilter.isVisible(currentSone).invoke(it) }
 				.sortedByDescending { it.time }
 				.let { posts ->
 					posts.paginate(soneRequest.core.preferences.postsPerPage)

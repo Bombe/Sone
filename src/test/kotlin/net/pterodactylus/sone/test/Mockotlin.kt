@@ -5,7 +5,7 @@ import org.mockito.*
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.*
 
-inline fun <reified T : Any> mock(): T = Mockito.mock<T>(T::class.java)!!
+inline fun <reified T : Any> mock(name: String? = null): T = Mockito.mock<T>(T::class.java, name)!!
 inline fun <reified T : Any> mockBuilder(): T = Mockito.mock<T>(T::class.java, Mockito.RETURNS_SELF)!!
 inline fun <reified T : Any> deepMock(): T = Mockito.mock<T>(T::class.java, Mockito.RETURNS_DEEP_STUBS)!!
 inline fun <reified T : Any> selfMock(): T = Mockito.mock<T>(T::class.java, Mockito.RETURNS_SELF)!!
@@ -30,5 +30,6 @@ inline fun <reified T> argumentCaptor(): ArgumentCaptor<T> = ArgumentCaptor.forC
 
 fun <T> eq(t: T): T {
 	ArgumentMatchers.eq(t)
+	@Suppress("UNCHECKED_CAST")
 	return null as T
 }

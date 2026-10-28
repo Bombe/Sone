@@ -13,7 +13,11 @@ import java.util.Arrays.*
 /**
  * Unit test for [NewPage].
  */
-class NewPageTest : WebPageTest(::NewPage) {
+class NewPageTest : WebPageTest() {
+
+	private val newElements = mock<NewElements>()
+	override val page: SoneTemplatePage
+		get() = NewPage(webInterface, loaders, templateRenderer, newElements)
 
 	@Before
 	fun setupNumberOfPostsPerPage() {
@@ -43,8 +47,8 @@ class NewPageTest : WebPageTest(::NewPage) {
 		val postReplies = asList(mock<PostReply>(), mock())
 		whenever(postReplies[0].post).thenReturn(posts[0].asOptional())
 		whenever(postReplies[1].post).thenReturn(extraPost.asOptional())
-		whenever(webInterface.getNewPosts(currentSone)).thenReturn(posts)
-		whenever(webInterface.getNewReplies(currentSone)).thenReturn(postReplies)
+		whenever(newElements.newPosts).thenReturn(posts)
+		whenever(newElements.newReplies).thenReturn(postReplies)
 
 		verifyNoRedirect {
 			val renderedPosts = templateContext.get<List<Post>>("posts", List::class.java)
@@ -59,7 +63,7 @@ class NewPageTest : WebPageTest(::NewPage) {
 	fun `posts are paginated properly`() {
 		webInterface.core.preferences.newPostsPerPage = 2
 		val posts = listOf(mock<Post>().withTime(2000), mock<Post>().withTime(3000), mock<Post>().withTime(1000))
-		whenever(webInterface.getNewPosts(currentSone)).thenReturn(posts)
+		whenever(newElements.newPosts).thenReturn(posts)
 		verifyNoRedirect {
 			assertThat((templateContext["pagination"] as Pagination<Post>).items, contains(posts[1], posts[0]))
 		}
@@ -71,7 +75,7 @@ class NewPageTest : WebPageTest(::NewPage) {
 		webInterface.core.preferences.newPostsPerPage = 2
 		addHttpRequestParameter("page", "1")
 		val posts = listOf(mock<Post>().withTime(2000), mock<Post>().withTime(3000), mock<Post>().withTime(1000))
-		whenever(webInterface.getNewPosts(currentSone)).thenReturn(posts)
+		whenever(newElements.newPosts).thenReturn(posts)
 		verifyNoRedirect {
 			assertThat((templateContext["pagination"] as Pagination<Post>).items, contains(posts[2]))
 		}

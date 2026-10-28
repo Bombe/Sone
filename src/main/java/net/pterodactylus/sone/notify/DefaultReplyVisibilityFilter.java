@@ -4,26 +4,25 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Sone;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
 
 /**
  * Filter that checks a {@link PostReply} for visibility.
  */
 @Singleton
-public class ReplyVisibilityFilter {
+public class DefaultReplyVisibilityFilter implements ReplyVisibilityFilter {
 
 	private final PostVisibilityFilter postVisibilityFilter;
 
 	@Inject
-	public ReplyVisibilityFilter(@Nonnull PostVisibilityFilter postVisibilityFilter) {
+	public DefaultReplyVisibilityFilter(@Nonnull PostVisibilityFilter postVisibilityFilter) {
 		this.postVisibilityFilter = postVisibilityFilter;
 	}
 
@@ -45,7 +44,8 @@ public class ReplyVisibilityFilter {
 	 * @return {@code true} if the reply is considered visible, {@code false}
 	 * otherwise
 	 */
-	boolean isReplyVisible(@Nullable Sone sone, @Nonnull PostReply reply) {
+	@Override
+	public boolean isReplyVisible(@Nullable Sone sone, @Nonnull PostReply reply) {
 		checkNotNull(reply, "reply must not be null");
 		Optional<Post> post = reply.getPost();
 		if (!post.isPresent()) {
@@ -55,16 +55,6 @@ public class ReplyVisibilityFilter {
 			return false;
 		}
 		return reply.getTime() <= System.currentTimeMillis();
-	}
-
-	@Nonnull
-	public Predicate<PostReply> isVisible(@Nullable final Sone currentSone) {
-		return new Predicate<PostReply>() {
-			@Override
-			public boolean apply(@Nullable PostReply postReply) {
-				return (postReply != null) && isReplyVisible(currentSone, postReply);
-			}
-		};
 	}
 
 }

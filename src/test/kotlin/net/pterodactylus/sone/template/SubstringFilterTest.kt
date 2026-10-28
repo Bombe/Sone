@@ -20,7 +20,7 @@ class SubstringFilterTest {
 	}
 
 	@Test
-	fun `filter returns "abc" if start is omitted and length is three`() {
+	fun `filter returns 'abc' if start is omitted and length is three`() {
 	    assertThat(filterText("length" to 3), equalTo<Any>("abc"))
 	}
 

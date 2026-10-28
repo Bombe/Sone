@@ -5,10 +5,9 @@ import freenet.clients.http.*
 import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.test.*
 import net.pterodactylus.sone.web.page.*
-import org.junit.*
-import org.junit.rules.*
 import org.mockito.Mockito.*
 import kotlin.test.Test
+import org.junit.Assert.assertThrows
 
 class PageToadletRegistryTest {
 
@@ -24,9 +23,6 @@ class PageToadletRegistryTest {
 			SonePlugin::class.isProvidedBy(sonePlugin)
 	)
 
-	@JvmField
-	@Rule
-	val expectedException: ExpectedException = ExpectedException.none()
 	private val pageToadletRegistry = injector.getInstance<PageToadletRegistry>()
 
 	@Test
@@ -60,8 +56,9 @@ class PageToadletRegistryTest {
 		val toadletWithMenuname = createPageToadlet("Test")
 		whenever(pageToadletFactory.createPageToadlet(page)).thenReturn(toadletWithMenuname)
 		pageToadletRegistry.registerToadlets()
-		expectedException.expect(IllegalStateException::class.java)
-		pageToadletRegistry.addPage(page)
+		assertThrows(IllegalStateException::class.java) {
+			pageToadletRegistry.addPage(page)
+		}
 	}
 
 	@Test
@@ -136,8 +133,9 @@ class PageToadletRegistryTest {
 		val toadlet = createPageToadlet()
 		whenever(pageToadletFactory.createPageToadlet(page)).thenReturn(toadlet)
 		pageToadletRegistry.registerToadlets()
-		expectedException.expect(IllegalStateException::class.java)
-		pageToadletRegistry.addDebugPage(page)
+		assertThrows(IllegalStateException::class.java) {
+			pageToadletRegistry.addDebugPage(page)
+		}
 	}
 
 	private fun createPageToadlet(menuName: String? = null) =

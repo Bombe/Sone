@@ -9,7 +9,7 @@ import net.pterodactylus.util.config.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import org.junit.*
-import org.junit.rules.*
+import org.junit.Assert.assertThrows
 import org.mockito.ArgumentMatchers.*
 import org.mockito.ArgumentMatchers.eq
 
@@ -17,10 +17,6 @@ import org.mockito.ArgumentMatchers.eq
  * Unit test for [ConfigurationSoneParser].
  */
 class ConfigurationSoneParserTest {
-
-	@Rule
-	@JvmField
-	val expectedException = ExpectedException.none()!!
 
 	private val configuration = mock<Configuration>()
 	private val sone = mock<Sone>().apply {
@@ -125,8 +121,9 @@ class ConfigurationSoneParserTest {
 	@Test
 	fun postWithoutTimeIsRecognized() {
 		setupPostWithoutTime()
-		expectedException.expect<InvalidPostFound>()
-		configurationSoneParser.parsePosts(createPostBuilderFactory())
+		assertThrows(InvalidPostFound::class.java) {
+			configurationSoneParser.parsePosts(createPostBuilderFactory())
+		}
 	}
 
 	private fun setupPostWithoutTime() {
@@ -136,8 +133,9 @@ class ConfigurationSoneParserTest {
 	@Test
 	fun postWithoutTextIsRecognized() {
 		setupPostWithoutText()
-		expectedException.expect<InvalidPostFound>()
-		configurationSoneParser.parsePosts(createPostBuilderFactory())
+		assertThrows(InvalidPostFound::class.java) {
+			configurationSoneParser.parsePosts(createPostBuilderFactory())
+		}
 	}
 
 	private fun setupPostWithoutText() {
@@ -188,8 +186,9 @@ class ConfigurationSoneParserTest {
 	@Test
 	fun missingPostIdIsRecognized() {
 		setupPostReplyWithMissingPostId()
-		expectedException.expect<InvalidPostReplyFound>()
-		configurationSoneParser.parsePostReplies(null)
+		assertThrows(InvalidPostReplyFound::class.java) {
+			configurationSoneParser.parsePostReplies(null)
+		}
 	}
 
 	private fun setupPostReplyWithMissingPostId() {
@@ -199,8 +198,9 @@ class ConfigurationSoneParserTest {
 	@Test
 	fun missingPostReplyTimeIsRecognized() {
 		setupPostReplyWithMissingPostReplyTime()
-		expectedException.expect<InvalidPostReplyFound>()
-		configurationSoneParser.parsePostReplies(null)
+		assertThrows(InvalidPostReplyFound::class.java) {
+			configurationSoneParser.parsePostReplies(null)
+		}
 	}
 
 	private fun setupPostReplyWithMissingPostReplyTime() {
@@ -210,8 +210,9 @@ class ConfigurationSoneParserTest {
 	@Test
 	fun missingPostReplyTextIsRecognized() {
 		setupPostReplyWithMissingPostReplyText()
-		expectedException.expect<InvalidPostReplyFound>()
-		configurationSoneParser.parsePostReplies(null)
+		assertThrows(InvalidPostReplyFound::class.java) {
+			configurationSoneParser.parsePostReplies(null)
+		}
 	}
 
 	private fun setupPostReplyWithMissingPostReplyText() {
@@ -305,22 +306,25 @@ class ConfigurationSoneParserTest {
 	@Test
 	fun albumWithInvalidTitleIsRecognized() {
 		setupAlbum(0, "A1", null, null, "D1", "I1")
-		expectedException.expect<InvalidAlbumFound>()
-		configurationSoneParser.parseTopLevelAlbums(createAlbumBuilderFactory())
+		assertThrows(InvalidAlbumFound::class.java) {
+			configurationSoneParser.parseTopLevelAlbums(createAlbumBuilderFactory())
+		}
 	}
 
 	@Test
 	fun albumWithInvalidDescriptionIsRecognized() {
 		setupAlbum(0, "A1", null, "T1", null, "I1")
-		expectedException.expect<InvalidAlbumFound>()
-		configurationSoneParser.parseTopLevelAlbums(createAlbumBuilderFactory())
+		assertThrows(InvalidAlbumFound::class.java) {
+			configurationSoneParser.parseTopLevelAlbums(createAlbumBuilderFactory())
+		}
 	}
 
 	@Test
 	fun albumWithInvalidParentIsRecognized() {
 		setupAlbum(0, "A1", "A0", "T1", "D1", "I1")
-		expectedException.expect<InvalidParentAlbumFound>()
-		configurationSoneParser.parseTopLevelAlbums(createAlbumBuilderFactory())
+		assertThrows(InvalidParentAlbumFound::class.java) {
+			configurationSoneParser.parseTopLevelAlbums(createAlbumBuilderFactory())
+		}
 	}
 
 	@Test
@@ -365,8 +369,9 @@ class ConfigurationSoneParserTest {
 		setupTopLevelAlbums()
 		configurationSoneParser.parseTopLevelAlbums(createAlbumBuilderFactory())
 		setupImage(0, "I1", null, 1000L, "K1", "T1", "D1", 16, 9)
-		expectedException.expect<InvalidImageFound>()
-		configurationSoneParser.parseImages(createImageBuilderFactory())
+		assertThrows(InvalidImageFound::class.java) {
+			configurationSoneParser.parseImages(createImageBuilderFactory())
+		}
 	}
 
 	@Test
@@ -374,8 +379,9 @@ class ConfigurationSoneParserTest {
 		setupTopLevelAlbums()
 		configurationSoneParser.parseTopLevelAlbums(createAlbumBuilderFactory())
 		setupImage(0, "I1", "A4", 1000L, "K1", "T1", "D1", 16, 9)
-		expectedException.expect<InvalidParentAlbumFound>()
-		configurationSoneParser.parseImages(createImageBuilderFactory())
+		assertThrows(InvalidParentAlbumFound::class.java) {
+			configurationSoneParser.parseImages(createImageBuilderFactory())
+		}
 	}
 
 	@Test
@@ -383,8 +389,9 @@ class ConfigurationSoneParserTest {
 		setupTopLevelAlbums()
 		configurationSoneParser.parseTopLevelAlbums(createAlbumBuilderFactory())
 		setupImage(0, "I1", "A1", null, "K1", "T1", "D1", 16, 9)
-		expectedException.expect<InvalidImageFound>()
-		configurationSoneParser.parseImages(createImageBuilderFactory())
+		assertThrows(InvalidImageFound::class.java) {
+			configurationSoneParser.parseImages(createImageBuilderFactory())
+		}
 	}
 
 	@Test
@@ -392,8 +399,9 @@ class ConfigurationSoneParserTest {
 		setupTopLevelAlbums()
 		configurationSoneParser.parseTopLevelAlbums(createAlbumBuilderFactory())
 		setupImage(0, "I1", "A1", 1000L, null, "T1", "D1", 16, 9)
-		expectedException.expect<InvalidImageFound>()
-		configurationSoneParser.parseImages(createImageBuilderFactory())
+		assertThrows(InvalidImageFound::class.java) {
+			configurationSoneParser.parseImages(createImageBuilderFactory())
+		}
 	}
 
 	@Test
@@ -401,8 +409,9 @@ class ConfigurationSoneParserTest {
 		setupTopLevelAlbums()
 		configurationSoneParser.parseTopLevelAlbums(createAlbumBuilderFactory())
 		setupImage(0, "I1", "A1", 1000L, "K1", null, "D1", 16, 9)
-		expectedException.expect<InvalidImageFound>()
-		configurationSoneParser.parseImages(createImageBuilderFactory())
+		assertThrows(InvalidImageFound::class.java) {
+			configurationSoneParser.parseImages(createImageBuilderFactory())
+		}
 	}
 
 	@Test
@@ -410,8 +419,9 @@ class ConfigurationSoneParserTest {
 		setupTopLevelAlbums()
 		configurationSoneParser.parseTopLevelAlbums(createAlbumBuilderFactory())
 		setupImage(0, "I1", "A1", 1000L, "K1", "T1", null, 16, 9)
-		expectedException.expect<InvalidImageFound>()
-		configurationSoneParser.parseImages(createImageBuilderFactory())
+		assertThrows(InvalidImageFound::class.java) {
+			configurationSoneParser.parseImages(createImageBuilderFactory())
+		}
 	}
 
 	@Test
@@ -419,8 +429,9 @@ class ConfigurationSoneParserTest {
 		setupTopLevelAlbums()
 		configurationSoneParser.parseTopLevelAlbums(createAlbumBuilderFactory())
 		setupImage(0, "I1", "A1", 1000L, "K1", "T1", "D1", null, 9)
-		expectedException.expect<InvalidImageFound>()
-		configurationSoneParser.parseImages(createImageBuilderFactory())
+		assertThrows(InvalidImageFound::class.java) {
+			configurationSoneParser.parseImages(createImageBuilderFactory())
+		}
 	}
 
 	@Test
@@ -428,8 +439,9 @@ class ConfigurationSoneParserTest {
 		setupTopLevelAlbums()
 		configurationSoneParser.parseTopLevelAlbums(createAlbumBuilderFactory())
 		setupImage(0, "I1", "A1", 1000L, "K1", "T1", "D1", 16, null)
-		expectedException.expect<InvalidImageFound>()
-		configurationSoneParser.parseImages(createImageBuilderFactory())
+		assertThrows(InvalidImageFound::class.java) {
+			configurationSoneParser.parseImages(createImageBuilderFactory())
+		}
 	}
 
 }

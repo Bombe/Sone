@@ -9,7 +9,7 @@ import net.pterodactylus.sone.text.LinkType.USK
 import net.pterodactylus.sone.utils.*
 import org.bitpedia.util.*
 import java.net.*
-import javax.inject.*
+import jakarta.inject.*
 
 /**
  * [Parser] implementation that can recognize Freenet URIs.
@@ -32,7 +32,7 @@ class SoneTextParser @Inject constructor(private val soneProvider: SoneProvider?
 				else
 					LinkType.values()
 							.mapNotNull { it.findNext(remainder.second) }
-							.minBy { it.position }
+							.minByOrNull { it.position }
 							.let {
 								when {
 									it == null -> PlainTextPart(remainder.second) to ""
@@ -66,13 +66,15 @@ class SoneTextParser @Inject constructor(private val soneProvider: SoneProvider?
 		}
 		SSK, USK ->
 			try {
-				FreenetURI(linkWithoutBacklink).let { uri ->
-					uri.allMetaStrings
-							?.takeIf { (it.size > 1) || ((it.size == 1) && (it.single() != "")) }
-							?.lastOrNull()
-							?: uri.docName
-							?: "${uri.keyType}@${uri.routingKey.asFreenetBase64}"
-				}.let { FreenetLinkPart(linkWithoutBacklink.removeSuffix("/"), it, trusted = context?.routingKey?.contentEquals(FreenetURI(linkWithoutBacklink).routingKey) == true) }
+				FreenetURI(linkWithoutBacklink)
+						.workaroundForFaultyConstructorInFred1485AndBelow()
+						.let { uri ->
+							uri.allMetaStrings
+									?.takeIf { (it.size > 1) || ((it.size == 1) && (it.single() != "")) }
+									?.lastOrNull()
+									?: uri.docName
+									?: "${uri.keyType}@${uri.routingKey.asFreenetBase64}"
+						}.let { FreenetLinkPart(linkWithoutBacklink.removeSuffix("/"), it, trusted = context?.routingKey?.contentEquals(FreenetURI(linkWithoutBacklink).routingKey) == true) }
 			} catch (e: MalformedURLException) {
 				PlainTextPart(linkWithoutBacklink)
 			}
@@ -92,6 +94,9 @@ class SoneTextParser @Inject constructor(private val soneProvider: SoneProvider?
 	}
 
 }
+
+private fun FreenetURI.workaroundForFaultyConstructorInFred1485AndBelow() =
+	also { if (it.routingKey == null) throw MalformedURLException("SSK/USK without routing key") }
 
 private fun List<String>.mergeMultipleEmptyLines() = fold(emptyList<String>()) { previous, current ->
 	if (previous.isEmpty()) {
@@ -175,9 +180,12 @@ private enum class LinkType(private val scheme: String, private val freenetLink:
 	}
 
 	private fun String.findEndOfLink() =
-			substring(0, whitespace.find(this)?.range?.start ?: length)
+			substring(0, nonLinkCharacters.find(this, findFirstCharacterAfterScheme())?.range?.start ?: length)
 					.dropLastWhile(::isPunctuation)
 					.upToFirstUnmatchedParen()
+
+	private fun String.findFirstCharacterAfterScheme() =
+		values().firstOrNull { startsWith(it.scheme) }?.scheme?.length ?: 0
 
 	private fun Int.validate() = validateLinkLength(this)
 	protected open fun validateLinkLength(length: Int) = length.takeIf { it > scheme.length }
@@ -193,9 +201,9 @@ private enum class LinkType(private val scheme: String, private val freenetLink:
 
 }
 
-private val punctuationChars = listOf('.', ',', '?', '!')
+private val punctuationChars = listOf('.', ',', '?', '!', ':')
 private fun isPunctuation(char: Char) = char in punctuationChars
 
-private val whitespace = Regex("[\\u000a\u0020\u00a0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u200c\u200d\u202f\u205f\u2060\u2800\u3000]")
+private val nonLinkCharacters = Regex("[\\u000a\u0020\u00a0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u200c\u200d\u202f\u205f\u2060\u2800\u3000]")
 
 private data class NextLink(val position: Int, val linkType: LinkType, val link: String, val remainder: String)

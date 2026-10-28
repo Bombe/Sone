@@ -13,25 +13,28 @@ import net.pterodactylus.sone.template.SoneAccessor
 import net.pterodactylus.sone.text.TimeTextConverter
 import net.pterodactylus.sone.utils.jsonObject
 import net.pterodactylus.sone.utils.toArray
+import net.pterodactylus.sone.web.NewElements
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
 import java.text.SimpleDateFormat
 import java.util.TimeZone
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 /**
  * The “get status” AJAX handler returns all information that is necessary to
  * update the web interface in real-time.
  */
 @ToadletPath("getStatus.ajax")
-class GetStatusAjaxPage(webInterface: WebInterface, private val elementLoader: ElementLoader, private val timeTextConverter: TimeTextConverter, private val l10nFilter: L10nFilter, timeZone: TimeZone):
+class GetStatusAjaxPage(webInterface: WebInterface, private val elementLoader: ElementLoader, private val newElements: NewElements, private val timeTextConverter: TimeTextConverter, private val l10nFilter: L10nFilter, timeZone: TimeZone):
 		JsonPage(webInterface) {
 
-	@Inject constructor(webInterface: WebInterface, elementLoader: ElementLoader, timeTextConverter: TimeTextConverter, l10nFilter: L10nFilter):
-			this(webInterface, elementLoader, timeTextConverter, l10nFilter, TimeZone.getDefault())
+	@Inject constructor(webInterface: WebInterface, elementLoader: ElementLoader, newElements: NewElements, timeTextConverter: TimeTextConverter, l10nFilter: L10nFilter):
+			this(webInterface, elementLoader, newElements, timeTextConverter, l10nFilter, TimeZone.getDefault())
 
-	private val dateFormatter = SimpleDateFormat("MMM d, yyyy, HH:mm:ss").apply {
-		this.timeZone = timeZone
+	private val dateFormatter by lazy {
+		SimpleDateFormat("MMM d, yyyy, HH:mm:ss").apply {
+			this.timeZone = timeZone
+		}
 	}
 
 	override fun createJsonObject(request: FreenetRequest) =
@@ -41,8 +44,8 @@ class GetStatusAjaxPage(webInterface: WebInterface, private val elementLoader: E
 					this["options"] = currentSone?.options?.toJsonOptions() ?: jsonObject {}
 					this["notificationHash"] = webInterface.getNotifications(currentSone).sortedBy { it.createdTime }.hashCode()
 					this["sones"] = request.httpRequest.getParam("soneIds").split(',').mapNotNull(core::getSone).plus(currentSone).filterNotNull().toJsonSones()
-					this["newPosts"] = webInterface.getNewPosts(currentSone).toJsonPosts()
-					this["newReplies"] = webInterface.getNewReplies(currentSone).toJsonReplies()
+					this["newPosts"] = newElements.newPosts.toJsonPosts()
+					this["newReplies"] = newElements.newReplies.toJsonReplies()
 					this["linkedElements"] = request.httpRequest.getParam("elements", "[]").asJson().map(JsonNode::asText).map(elementLoader::loadElement).toJsonElements()
 				}
 			}

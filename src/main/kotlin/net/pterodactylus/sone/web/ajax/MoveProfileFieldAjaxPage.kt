@@ -6,7 +6,7 @@ import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 /**
  * AJAX page that lets the user move a profile field up or down.

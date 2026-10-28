@@ -5,7 +5,7 @@ import net.pterodactylus.sone.utils.ifFalse
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 /**
  * AJAX page that lets the user rename a profile field.

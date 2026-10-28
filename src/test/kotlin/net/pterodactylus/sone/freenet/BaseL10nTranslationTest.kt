@@ -13,7 +13,7 @@ import java.util.*
 class BaseL10nTranslationTest {
 
 	private val baseL10n = mock<BaseL10n>()
-	private val translation = BaseL10nTranslation(baseL10n)
+	private val translation = BaseL10nTranslation { baseL10n }
 
 	@Test
 	fun `translate method is facade for the correct method`() {

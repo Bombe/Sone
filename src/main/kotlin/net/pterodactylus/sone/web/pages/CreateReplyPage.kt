@@ -7,7 +7,7 @@ import net.pterodactylus.sone.utils.*
 import net.pterodactylus.sone.web.*
 import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.template.*
-import javax.inject.*
+import jakarta.inject.*
 
 /**
  * This page lets the user post a reply to a post.

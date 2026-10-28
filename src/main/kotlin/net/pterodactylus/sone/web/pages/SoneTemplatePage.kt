@@ -28,7 +28,7 @@ open class SoneTemplatePage(
 	private val sessionProvider: SessionProvider = webInterface
 	protected val translation: Translation = webInterface.translation
 
-	protected fun getCurrentSone(toadletContext: ToadletContext, createSession: Boolean = true) =
+	protected fun getCurrentSone(toadletContext: ToadletContext) =
 			sessionProvider.getCurrentSone(toadletContext)
 
 	protected fun setCurrentSone(toadletContext: ToadletContext, sone: Sone?) =

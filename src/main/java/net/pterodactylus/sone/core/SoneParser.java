@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.logging.*;
 
 import javax.annotation.*;
-import javax.inject.*;
+import jakarta.inject.*;
 
 import net.pterodactylus.sone.data.*;
 import net.pterodactylus.sone.data.Profile.*;

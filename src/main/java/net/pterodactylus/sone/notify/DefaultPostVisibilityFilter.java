@@ -1,10 +1,8 @@
 package net.pterodactylus.sone.notify;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
@@ -12,13 +10,11 @@ import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.freenet.wot.Trust;
 import net.pterodactylus.util.notify.Notification;
 
-import com.google.common.base.Predicate;
-
 /**
  * Filters {@link Notification}s involving {@link Post}s.
  */
 @Singleton
-public class PostVisibilityFilter {
+public class DefaultPostVisibilityFilter implements PostVisibilityFilter {
 
 	/**
 	 * Checks whether a post is visible to the given Sone. A post is not
@@ -51,8 +47,8 @@ public class PostVisibilityFilter {
 	 * @return {@code true} if the post is considered visible, {@code false}
 	 * otherwise
 	 */
-	boolean isPostVisible(@Nullable Sone sone, @Nonnull Post post) {
-		checkNotNull(post, "post must not be null");
+	@Override
+	public boolean isPostVisible(@Nullable Sone sone, @Nonnull Post post) {
 		if (!post.isLoaded()) {
 			return false;
 		}
@@ -80,16 +76,6 @@ public class PostVisibilityFilter {
 			}
 		}
 		return post.getTime() <= System.currentTimeMillis();
-	}
-
-	@Nonnull
-	public Predicate<Post> isVisible(@Nullable final Sone currentSone) {
-		return new Predicate<Post>() {
-			@Override
-			public boolean apply(@Nullable Post post) {
-				return (post != null) && isPostVisible(currentSone, post);
-			}
-		};
 	}
 
 }

@@ -8,7 +8,7 @@ import net.pterodactylus.sone.utils.*
 import net.pterodactylus.sone.web.*
 import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.template.*
-import javax.inject.*
+import jakarta.inject.*
 
 /**
  * Page that lets the user create a new album.

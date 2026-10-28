@@ -23,17 +23,11 @@ import net.pterodactylus.sone.web.WebTestUtils.*
 import net.pterodactylus.sone.web.page.FreenetTemplatePage.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
-import org.junit.Rule
-import org.junit.rules.*
-import org.junit.rules.ExpectedException.*
 import org.mockito.Mockito.*
 import kotlin.test.*
+import org.junit.Assert.assertThrows
 
 class DebugPageTest : WebPageTest(::DebugPage) {
-
-	@Rule
-	@JvmField
-	val expectedException: ExpectedException = none()
 
 	@Test
 	fun `page returns correct path`() {
@@ -61,9 +55,10 @@ class DebugPageTest : WebPageTest(::DebugPage) {
 
 	@Test
 	fun `get request redirects to index`() {
-		expectedException.expect(redirectsTo("./"))
-		page.handleRequest(soneRequest, templateContext)
+		val redirect = assertThrows(RedirectException::class.java) {
+			page.handleRequest(soneRequest, templateContext)
+		}
+		assertThat(redirect, redirectsTo("./"))
 	}
 
 }
-

@@ -3,6 +3,7 @@ package net.pterodactylus.sone.template
 import com.codahale.metrics.*
 import net.pterodactylus.sone.utils.*
 import net.pterodactylus.util.template.*
+import java.util.Locale
 
 /**
  * [Filter] that renders a [Histogram] as a table row.
@@ -43,4 +44,4 @@ private val template = """<tr>
 </tr>""".asTemplate()
 
 private fun String.dotToCamel() =
-		split(".").joinToString("", transform = String::capitalize)
+		split(".").joinToString("", transform = { it.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() } })

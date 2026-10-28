@@ -3,6 +3,8 @@
 /* first, override some fproxy rules. */
 #sone div, #sone span, #sone .post .time,#sone .post .delete,#sone .post .show-reply-form, input[type=text], textarea {
 	font: inherit;
+	/* workaround Fred’s CSS mess */
+	max-width: inherit;
 }
 
 input[type=text], textarea {
@@ -801,6 +803,7 @@ textarea {
 	margin-top: 1em;
 	border-top: solid 1px #ccc;
 	padding-top: 2em;
+	padding-bottom: 1em;
 	text-align: center;
 	font-size: 75%;
 	color: #888;

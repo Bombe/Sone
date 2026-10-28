@@ -18,14 +18,11 @@
 package net.pterodactylus.sone.data.impl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.logging.Logger.getLogger;
 import static net.pterodactylus.sone.data.PostKt.newestPostFirst;
 import static net.pterodactylus.sone.data.ReplyKt.newestReplyFirst;
-import static net.pterodactylus.sone.data.SoneKt.*;
 
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -49,8 +46,6 @@ import net.pterodactylus.sone.data.SoneOptions;
 import net.pterodactylus.sone.data.SoneOptions.DefaultSoneOptions;
 import net.pterodactylus.sone.database.Database;
 import net.pterodactylus.sone.freenet.wot.Identity;
-
-import freenet.keys.FreenetURI;
 
 import com.google.common.hash.Hasher;
 import com.google.common.hash.Hashing;
@@ -170,26 +165,6 @@ public class SoneImpl implements Sone {
 	 */
 	public boolean isLocal() {
 		return local;
-	}
-
-	/**
-	 * Returns the request URI of this Sone.
-	 *
-	 * @return The request URI of this Sone
-	 */
-	@Nonnull
-	public FreenetURI getRequestUri() {
-		try {
-			return new FreenetURI(getIdentity().getRequestUri())
-					.setKeyType("USK")
-					.setDocName("Sone")
-					.setMetaString(new String[0])
-					.setSuggestedEdition(latestEdition);
-		} catch (MalformedURLException e) {
-			throw new IllegalStateException(
-					format("Identity %s's request URI is incorrect.",
-							getIdentity()), e);
-		}
 	}
 
 	/**
@@ -659,16 +634,6 @@ public class SoneImpl implements Sone {
 		hash.putString(")", UTF_8);
 
 		return hash.hash().toString();
-	}
-
-	//
-	// INTERFACE Comparable<Sone>
-	//
-
-	/** {@inheritDoc} */
-	@Override
-	public int compareTo(Sone sone) {
-		return niceNameComparator().compare(this, sone);
 	}
 
 	//

@@ -95,7 +95,7 @@ public class ImageImpl implements Image {
 	@Override
 	public Image setAlbum(Album album) {
 		checkNotNull(album, "album must not be null");
-		checkNotNull(album.getSone().equals(getSone()), "album must belong to the same Sone as this image");
+		checkState(album.getSone().equals(getSone()), "album must belong to the same Sone as this image");
 		this.album = album;
 		return this;
 	}

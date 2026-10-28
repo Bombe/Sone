@@ -26,7 +26,6 @@ import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
 import org.hamcrest.Matchers.nullValue
 import org.junit.*
-import org.junit.rules.*
 import org.mockito.*
 import org.mockito.ArgumentCaptor.*
 import org.mockito.ArgumentMatchers.eq
@@ -34,6 +33,7 @@ import org.mockito.Mockito.*
 import java.io.*
 import java.util.*
 import kotlin.test.Test
+import org.junit.Assert.assertThrows
 
 /**
  * Unit test for [FreenetInterface].
@@ -42,16 +42,12 @@ class FreenetInterfaceTest {
 
 	@Rule
 	@JvmField
-	val expectionException: ExpectedException = ExpectedException.none()
-
-	@Rule
-	@JvmField
 	val silencedLogging = silencedLogging()
 
 	@Suppress("UnstableApiUsage")
 	private val eventBus = mock<EventBus>()
 	private val node = mock<Node>()
-	private val nodeClientCore = mock<NodeClientCore>()
+	private val clientContext = mock<ClientContext>()
 	private val highLevelSimpleClient: HighLevelSimpleClient = mock(HighLevelSimpleClient::class.java, withSettings().extraInterfaces(RequestClient::class.java))
 	private val randomSource = DummyRandomSource()
 	private val uskManager = mock<USKManager>()
@@ -69,12 +65,8 @@ class FreenetInterfaceTest {
 	private val freenetInterface: FreenetInterface
 
 	init {
-		whenever(nodeClientCore.makeClient(anyShort(), anyBoolean(), anyBoolean())).thenReturn(highLevelSimpleClient)
-		setField(node, "clientCore", nodeClientCore)
-		setField(node, "random", randomSource)
-		setField(nodeClientCore, "uskManager", uskManager)
-		setField(nodeClientCore, "clientContext", mock<ClientContext>())
-		freenetInterface = FreenetInterface(eventBus, node, soneUriCreator)
+		whenever(node.getRandom()).thenReturn(randomSource)
+		freenetInterface = FreenetInterface(eventBus, node, uskManager, clientContext, soneUriCreator) { _, _, _ -> highLevelSimpleClient }
 		insertToken = freenetInterface.InsertToken(image)
 		insertToken.setBucket(bucket)
 	}
@@ -167,8 +159,9 @@ class FreenetInterfaceTest {
 		whenever(highLevelSimpleClient.getInsertContext(anyBoolean())).thenReturn(insertContext)
 		val insertBlockCaptor = forClass(InsertBlock::class.java)
 		whenever(highLevelSimpleClient.insert(insertBlockCaptor.capture(), eq(null as String?), eq(false), eq(insertContext), eq(insertToken), anyShort())).thenThrow(InsertException::class.java)
-		expectionException.expect(SoneInsertException::class.java)
-		freenetInterface.insertImage(temporaryImage, image, insertToken)
+		assertThrows(SoneInsertException::class.java) {
+			freenetInterface.insertImage(temporaryImage, image, insertToken)
+		}
 	}
 
 	@Test
@@ -184,8 +177,9 @@ class FreenetInterfaceTest {
 	@Test
 	fun `insert exception is forwarded as sone exception`() {
 		whenever(highLevelSimpleClient.insertManifest(any(), any(), any())).thenThrow(InsertException::class.java)
-		expectionException.expect(SoneException::class.java)
-		freenetInterface.insertDirectory(null, null, null)
+		assertThrows(SoneException::class.java) {
+			freenetInterface.insertDirectory(null, null, null)
+		}
 	}
 
 	@Test
@@ -396,8 +390,21 @@ class FreenetInterfaceTest {
 	}
 
 	@Test
+	fun `request is not cancelled for image mime type in simple manifest`() {
+		verifySnoopCancelsRequestForMimeType("image/png", false, simpleManifest = true)
+		verify(backgroundFetchCallback, never()).failed(uri)
+	}
+
+	@Test
 	fun `request is cancelled for null mime type`() {
 		verifySnoopCancelsRequestForMimeType(null, true)
+		verify(backgroundFetchCallback, never()).shouldCancel(eq(uri), any(), anyLong())
+		verify(backgroundFetchCallback).failed(uri)
+	}
+
+	@Test
+	fun `request is cancelled for null mime type in simple manifest`() {
+		verifySnoopCancelsRequestForMimeType(null, true, simpleManifest = true)
 		verify(backgroundFetchCallback, never()).shouldCancel(eq(uri), any(), anyLong())
 		verify(backgroundFetchCallback).failed(uri)
 	}
@@ -409,8 +416,20 @@ class FreenetInterfaceTest {
 	}
 
 	@Test
+	fun `request is cancelled for video mime type in simple manifest`() {
+		verifySnoopCancelsRequestForMimeType("video/mkv", true, simpleManifest = true)
+		verify(backgroundFetchCallback).failed(uri)
+	}
+
+	@Test
 	fun `request is cancelled for audio mime type`() {
 		verifySnoopCancelsRequestForMimeType("audio/mpeg", true)
+		verify(backgroundFetchCallback).failed(uri)
+	}
+
+	@Test
+	fun `request is cancelled for audio mime type in simple manifest`() {
+		verifySnoopCancelsRequestForMimeType("audio/mpeg", true, simpleManifest = true)
 		verify(backgroundFetchCallback).failed(uri)
 	}
 
@@ -420,13 +439,25 @@ class FreenetInterfaceTest {
 		verify(backgroundFetchCallback).failed(uri)
 	}
 
-	private fun verifySnoopCancelsRequestForMimeType(mimeType: String?, cancel: Boolean) {
+	@Test
+	fun `request is cancelled for text mime type in simple manifest`() {
+		verifySnoopCancelsRequestForMimeType("text/plain", true, simpleManifest = true)
+		verify(backgroundFetchCallback).failed(uri)
+	}
+
+	private fun verifySnoopCancelsRequestForMimeType(mimeType: String?, cancel: Boolean, simpleManifest: Boolean = false) {
 		whenever(backgroundFetchCallback.shouldCancel(eq(uri), if (mimeType != null) eq(mimeType) else isNull(), anyLong())).thenReturn(cancel)
 		freenetInterface.startFetch(uri, backgroundFetchCallback)
 		val snoopMetadata = forClass(SnoopMetadata::class.java)
 		verify(clientGetter).metaSnoop = snoopMetadata.capture()
 		val metadata = mock<Metadata>()
-		whenever(metadata.mimeType).thenReturn(mimeType)
+		whenever(metadata.isSimpleManifest).thenReturn(simpleManifest)
+		if (simpleManifest) {
+			val innerMetadata = mock<Metadata>().also { whenever(it.mimeType).thenReturn(mimeType) }
+			whenever(metadata.documents).thenReturn(mapOf("file" to innerMetadata).let(::HashMap))
+		} else {
+			whenever(metadata.mimeType).thenReturn(mimeType)
+		}
 		assertThat(snoopMetadata.value.snoopMetadata(metadata, mock()), equalTo(cancel))
 	}
 

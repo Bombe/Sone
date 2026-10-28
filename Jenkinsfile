@@ -6,34 +6,58 @@ pipeline {
     }
 
     stages {
-        stage('Build') {
+        stage('Build (Java 8)') {
+            tools {
+                jdk 'OpenJDK 8'
+            }
             steps {
-                sh './gradlew clean classes testClasses'
+                sh './gradlew --no-daemon clean classes testClasses'
             }
         }
-        stage('Test') {
+        stage('Test (Java 8)') {
+            tools {
+                jdk 'OpenJDK 8'
+            }
             steps {
-                sh './gradlew test'
+                sh './gradlew --no-daemon test jacocoTestReport'
             }
             post {
                 always {
-                    junit 'build/test-results/test/*.xml'
+                    junit 'build/test-results/*/*.xml'
+                    recordCoverage(tools: [[parser: 'JACOCO', pattern: '**/jacocoTestReport.xml']])
                 }
             }
         }
-        stage('Binary') {
+        stage('Binary (Java 8)') {
+            tools {
+                jdk 'OpenJDK 8'
+            }
             steps {
-                sh './gradlew fatJar'
+                sh './gradlew --no-daemon fatJar'
                 archiveArtifacts artifacts: 'build/libs/sone*-jar-with-dependencies.jar', fingerprint: true
             }
         }
-        stage('Reports') {
+        stage('Compatibility (Java 17)') {
+            tools {
+                jdk 'OpenJDK 17'
+            }
             steps {
-                sh './gradlew jacocoTestReport findbugsMain countLines'
-                jacoco classPattern: 'build/classes/*/main', sourcePattern: '**/src/main/'
-                findbugs canComputeNew: false, defaultEncoding: '', excludePattern: '', healthy: '', includePattern: '', pattern: '**/findbugs/main.xml', unHealthy: ''
-                sloccountPublish encoding: '', pattern: 'build/reports/cloc/*.xml'
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    sh './gradlew --no-daemon clean test'
+                }
+            }
+        }
+        stage('Compatibility (Java 21)') {
+            tools {
+                jdk 'OpenJDK 21'
+            }
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    sh './gradlew --no-daemon clean test'
+                }
             }
         }
     }
 }
+
+// vi: ts=4 sw=4 et si

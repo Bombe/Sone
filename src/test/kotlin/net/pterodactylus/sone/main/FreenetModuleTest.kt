@@ -1,16 +1,22 @@
 package net.pterodactylus.sone.main
 
-import com.google.inject.*
+import com.google.inject.Guice.createInjector
+import com.google.inject.Injector
+import com.google.inject.name.Names
 import freenet.client.*
+import freenet.client.async.ClientContext
+import freenet.client.async.USKManager
 import freenet.clients.http.*
 import freenet.node.*
 import freenet.pluginmanager.*
+import java.io.File
+import net.pterodactylus.sone.freenet.HighLevelSimpleClientCreator
 import net.pterodactylus.sone.freenet.plugin.*
 import net.pterodactylus.sone.test.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import org.junit.*
-import org.junit.rules.*
+import org.junit.rules.TemporaryFolder
 import org.mockito.*
 import org.mockito.Mockito.*
 
@@ -19,25 +25,26 @@ import org.mockito.Mockito.*
  */
 class FreenetModuleTest {
 
-	@Rule
-	@JvmField
-	val expectedException = ExpectedException.none()!!
-
 	private val sessionManager = mock<SessionManager>()
+	private val uskManager = mock<USKManager>()
+	private val clientContext = mock<ClientContext>()
 	private val pluginRespirator = deepMock<PluginRespirator>().apply {
 		whenever(getSessionManager("Sone")).thenReturn(sessionManager)
 	}
-	private val node = pluginRespirator.node!!
+	private val nodeClientCore = mock<NodeClientCore>().also {
+		whenever(it.getUskManager()).thenReturn(uskManager)
+		whenever(it.getClientContext()).thenReturn(clientContext)
+	}
+	private val node = pluginRespirator.node!!.also {
+		whenever(it.getClientCore()).thenReturn(nodeClientCore)
+	}
 	private val highLevelSimpleClient = pluginRespirator.hlSimpleClient!!
 	private val toadletContainer: ToadletContainer = pluginRespirator.toadletContainer
 	private val pageMaker: PageMaker = pluginRespirator.pageMaker
-	private val module = FreenetModule(pluginRespirator)
-	private val injector = Guice.createInjector(module)
 
 	@Test
-	fun `plugin respirator is not bound`() {
-		expectedException.expect(Exception::class.java)
-		injector.getInstance<PluginRespirator>()
+	fun `plugin respirator is returned correctly`() {
+		assertThat(injector.getInstance(), sameInstance(pluginRespirator))
 	}
 
 	@Test
@@ -92,6 +99,7 @@ class FreenetModuleTest {
 	}
 
 	@Test
+	@Suppress("DEPRECATION")
 	fun `plugin respirator facade is returned correctly`() {
 		val pluginRespiratorFacade = injector.getInstance<PluginRespiratorFacade>()
 		pluginRespiratorFacade.getPluginTalker(mock(), "test.plugin", "test-request-1")
@@ -112,5 +120,36 @@ class FreenetModuleTest {
 	fun `plugin connector facade is returned as singleton`() {
 		injector.verifySingletonInstance<PluginConnector>()
 	}
+
+	@Test
+	fun `high level simple client creator is returned correctly`() {
+		assertThat(injector.getInstance<HighLevelSimpleClientCreator>(), notNullValue());
+	}
+
+	@Test
+	fun `client context is returned correctly`() {
+		assertThat(injector.getInstance<ClientContext>(), sameInstance(clientContext))
+	}
+
+	@Test
+	fun `usk manager is returned correctly`() {
+		assertThat(injector.getInstance<USKManager>(), sameInstance(uskManager))
+	}
+
+	@Test
+	fun `node user dir is returned correctly`() {
+		assertThat(createInjector("/node/user-dir").getInstance<String>(Names.named("NodeUserDir")), equalTo("/node/user-dir"))
+	}
+
+	private fun createInjector(databasePath: String = tempFolder.newFolder().path): Injector {
+		whenever(node.userDir).thenReturn(File(databasePath))
+		return createInjector(FreenetModule(pluginRespirator))
+	}
+
+	@Rule
+	@JvmField
+	val tempFolder = TemporaryFolder()
+
+	private val injector by lazy { createInjector() }
 
 }

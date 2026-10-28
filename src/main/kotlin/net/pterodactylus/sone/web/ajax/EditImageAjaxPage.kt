@@ -10,7 +10,7 @@ import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.template.TemplateContext
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 /**
  * Page that stores a user’s image modifications.

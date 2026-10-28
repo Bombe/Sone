@@ -2,7 +2,7 @@ package net.pterodactylus.sone.web.page
 
 import net.pterodactylus.util.template.*
 import java.io.*
-import javax.inject.*
+import jakarta.inject.*
 
 class TemplateRenderer @Inject constructor(private val templateContextFactory: TemplateContextFactory) {
 

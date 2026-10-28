@@ -22,7 +22,7 @@ import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.util.notify.*
 import java.util.concurrent.*
 import java.util.concurrent.TimeUnit.*
-import javax.inject.*
+import jakarta.inject.*
 
 /**
  * Handler for the [Startup] event notification.

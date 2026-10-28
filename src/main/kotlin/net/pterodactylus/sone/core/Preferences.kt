@@ -30,12 +30,13 @@ import net.pterodactylus.sone.utils.DefaultOption
 import net.pterodactylus.util.config.Configuration
 import net.pterodactylus.util.config.ConfigurationException
 import java.lang.Integer.MAX_VALUE
+import net.pterodactylus.sone.core.event.MaxAgeOfPostsToLoadChangedEvent
 
 /**
  * Convenience interface for external classes that want to access the core’s
  * configuration.
  */
-class Preferences(private val eventBus: EventBus) {
+class DefaultPreferences(private val eventBus: EventBus) {
 
 	private val _insertionDelay = DefaultOption(60) { it in 0..MAX_VALUE }
 	val insertionDelay: Int get() = _insertionDelay.get()
@@ -44,7 +45,6 @@ class Preferences(private val eventBus: EventBus) {
 		set(value) {
 			_insertionDelay.set(value)
 			eventBus.post(InsertionDelayChangedEvent(insertionDelay))
-			eventBus.post(PreferenceChangedEvent("InsertionDelay", insertionDelay))
 		}
 
 	private val _postsPerPage = DefaultOption(10) { it in 1..MAX_VALUE }
@@ -53,7 +53,6 @@ class Preferences(private val eventBus: EventBus) {
 		get() = unsupported
 		set(value) {
 			_postsPerPage.set(value)
-			eventBus.post(PreferenceChangedEvent("PostsPerPage", postsPerPage))
 		}
 
 	private val _imagesPerPage = DefaultOption(9) { it in 1..MAX_VALUE }
@@ -112,6 +111,18 @@ class Preferences(private val eventBus: EventBus) {
 			}
 		}
 
+	private val _maxAgeOfPostsToLoad = DefaultOption(365)
+	val maxAgeOfPostsToLoad: Int get() = _maxAgeOfPostsToLoad.get()
+	var newMaxAgeOfPostsToLoad: Int?
+		get() = unsupported
+		set(value) {
+			if ((value ?: 0) < 0) {
+				throw IllegalArgumentException("maxAgeOfPostsToLoad cannot be negative")
+			}
+			_maxAgeOfPostsToLoad.set(value)
+			eventBus.post(MaxAgeOfPostsToLoadChangedEvent(_maxAgeOfPostsToLoad.get()))
+		}
+
 	@Throws(ConfigurationException::class)
 	fun saveTo(configuration: Configuration) {
 		configuration.getIntValue("Option/ConfigurationVersion").value = 0
@@ -124,6 +135,7 @@ class Preferences(private val eventBus: EventBus) {
 		configuration.getBooleanValue("Option/ActivateFcpInterface").value = _fcpInterfaceActive.real
 		configuration.getIntValue("Option/FcpFullAccessRequired").value = toInt(_fcpFullAccessRequired.real)
 		configuration.getBooleanValue("Option/StrictFiltering").value = _strictFiltering.real
+		configuration.getIntValue("Option/MaxAgeOfPostsToLoad").value = _maxAgeOfPostsToLoad.real
 	}
 
 	private fun toInt(fullAccessRequired: FullAccessRequired?): Int? {

@@ -131,7 +131,7 @@ class FreenetTemplatePageTest {
 		val request = deepMock<FreenetRequest>()
 		val pageMakerInteractionFactory = deepMock<PageMakerInteractionFactory>()
 		whenever(pageMakerInteractionFactory.createPageMaker(request.toadletContext, "page title").renderPage()).thenReturn("<page>")
-		setField(page, "pageMakerInteractionFactory", pageMakerInteractionFactory)
+		setField<FreenetTemplatePage>(page, "pageMakerInteractionFactory", pageMakerInteractionFactory)
 		val response = page.handleRequest(request, Response(ByteArrayOutputStream()))
 		assertThat(response.statusCode, equalTo(200))
 		assertThat((response.content as ByteArrayOutputStream).toString(UTF_8.name()), equalTo("<page>"))

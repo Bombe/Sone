@@ -9,7 +9,12 @@ buildscript {
 
 import org.ajoberstar.grgit.Grgit
 
+clean.doLast {
+    new File("src/generated/resources/version.yaml").delete()
+}
+
 task(writeVersion) {
+    it.outputs.file("src/generated/resources/version.yaml")
     doLast {
         def grgit = Grgit.open(dir: project.rootDir)
         def version = grgit.resolve.toCommit("HEAD").id

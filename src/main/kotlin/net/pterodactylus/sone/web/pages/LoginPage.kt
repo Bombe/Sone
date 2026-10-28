@@ -6,7 +6,7 @@ import net.pterodactylus.sone.utils.*
 import net.pterodactylus.sone.web.*
 import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.template.*
-import javax.inject.*
+import jakarta.inject.*
 
 /**
  * The login page lets the user log in.
@@ -35,7 +35,7 @@ class LoginPage @Inject constructor(webInterface: WebInterface, loaders: Loaders
 
 	override fun isEnabled(soneRequest: SoneRequest) = when {
 		soneRequest.core.preferences.requireFullAccess && !soneRequest.toadletContext.isAllowedFullAccess -> false
-		else -> getCurrentSone(soneRequest.toadletContext, false) == null
+		else -> getCurrentSone(soneRequest.toadletContext) == null
 	}
 
 }

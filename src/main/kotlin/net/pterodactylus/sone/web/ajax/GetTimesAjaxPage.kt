@@ -1,5 +1,6 @@
 package net.pterodactylus.sone.web.ajax
 
+import com.fasterxml.jackson.databind.node.ObjectNode
 import net.pterodactylus.sone.freenet.L10nFilter
 import net.pterodactylus.sone.text.TimeTextConverter
 import net.pterodactylus.sone.utils.jsonObject
@@ -8,7 +9,7 @@ import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
 import java.text.SimpleDateFormat
 import java.util.TimeZone
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 /**
  * Ajax page that returns a formatted, relative timestamp for replies or posts.
@@ -44,7 +45,7 @@ class GetTimesAjaxPage @Inject constructor(webInterface: WebInterface,
 					"tooltip" to synchronized(dateTimeFormatter) {
 						dateTimeFormatter.format(time)
 					})
-		}.forEach { this@jsonObject.set(it.first, it.second) }
+		}.forEach { this@jsonObject.set<ObjectNode>(it.first, it.second) }
 	}
 
 }

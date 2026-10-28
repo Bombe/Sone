@@ -28,6 +28,7 @@ class OptionsPageTest : WebPageTest(::OptionsPage) {
 		core.preferences.newPostCutOffLength = 51
 		core.preferences.newPostsPerPage = 10
 		core.preferences.newStrictFiltering = true
+		core.preferences.newMaxAgeOfPostsToLoad = 123
 	}
 
 	@Before
@@ -78,6 +79,7 @@ class OptionsPageTest : WebPageTest(::OptionsPage) {
 			assertThat(templateContext["post-cut-off-length"], equalTo<Any>(51))
 			assertThat(templateContext["posts-per-page"], equalTo<Any>(10))
 			assertThat(templateContext["strict-filtering"], equalTo<Any>(true))
+			assertThat(templateContext["max-age-of-posts-to-load"], equalTo(123))
 		}
 	}
 
@@ -317,6 +319,26 @@ class OptionsPageTest : WebPageTest(::OptionsPage) {
 	@Test
 	fun `strict filtering can be set to false`() {
 		verifyThatPreferencesCanBeSet("strict-filtering", null, false) { core.preferences.strictFiltering }
+	}
+
+	@Test
+	fun `max age of posts to load can be set`() {
+		verifyThatPreferencesCanBeSet("max-age-of-posts-to-load", "23", 23) { core.preferences.maxAgeOfPostsToLoad }
+	}
+
+	@Test
+	fun `max age of posts to load cannot be set to a negative value`() {
+		verifyThatWrongValueForPreferenceIsDetected("max-age-of-posts-to-load", "-23")
+	}
+
+	@Test
+	fun `max age of posts to load is set to default on invalid value`() {
+		verifyThatPreferencesCanBeSet("max-age-of-posts-to-load", "invalid", 365) { core.preferences.maxAgeOfPostsToLoad }
+	}
+
+	@Test
+	fun `max age of posts to load is set to default on empty value`() {
+		verifyThatPreferencesCanBeSet("max-age-of-posts-to-load", "", 365) { core.preferences.maxAgeOfPostsToLoad }
 	}
 
 	@Test

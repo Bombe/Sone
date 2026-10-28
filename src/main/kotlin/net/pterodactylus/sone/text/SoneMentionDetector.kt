@@ -22,7 +22,7 @@ import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.database.*
 import net.pterodactylus.sone.utils.*
-import javax.inject.*
+import jakarta.inject.*
 
 /**
  * Listens to [NewPostFoundEvent]s and [NewPostReplyFoundEvent], parses the

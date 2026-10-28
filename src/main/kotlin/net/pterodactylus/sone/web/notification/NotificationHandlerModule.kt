@@ -29,8 +29,8 @@ import net.pterodactylus.util.notify.*
 import java.util.concurrent.*
 import java.util.concurrent.TimeUnit.*
 import java.util.function.*
-import javax.inject.*
-import javax.inject.Singleton
+import jakarta.inject.*
+import jakarta.inject.Singleton
 
 /**
  * Guice module for creating all notification handlers.

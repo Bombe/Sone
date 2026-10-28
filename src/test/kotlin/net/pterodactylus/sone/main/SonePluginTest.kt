@@ -35,9 +35,10 @@ class SonePluginTest {
 	private val uskManager = deepMock<USKManager>()
 
 	init {
-		setField(node, "clientCore", clientCore)
+		whenever(node.getClientCore()).thenReturn(clientCore)
 		whenever(pluginRespirator.node).thenReturn(node)
-		setField(clientCore, "uskManager", uskManager)
+		whenever(clientCore.getUskManager()).thenReturn(uskManager)
+		whenever(clientCore.getClientContext()).thenReturnMock()
 	}
 
 	@Test
@@ -147,7 +148,7 @@ class SonePluginTest {
 	}
 
 	@Test
-	fun `config-not-read event is sent to event bus when new config is true`() {
+	fun `config-not-read event is sent to event bus when config file is invalid`() {
 		File("sone.properties").deleteAfter {
 			writeText("Invalid")
 			val configNotReadReceived = AtomicBoolean()
@@ -160,7 +161,7 @@ class SonePluginTest {
 	}
 
 	@Test
-	fun `config-not-read event is not sent to event bus when first start is true`() {
+	fun `config-not-read event is not sent to event bus when config file does not exist`() {
 		File("sone.properties").delete()
 		val configNotReadReceived = AtomicBoolean()
 		runSonePluginWithRealInjector {
@@ -171,7 +172,7 @@ class SonePluginTest {
 	}
 
 	@Test
-	fun `config-not-read event is not sent to event bus when new config is false`() {
+	fun `config-not-read event is not sent to event bus when config file is valid`() {
 		File("sone.properties").deleteAfter {
 			writeText("# comment")
 			val configNotReadReceived = AtomicBoolean()
@@ -218,6 +219,7 @@ class SonePluginTest {
 		assertThat(shutdownReceived.get(), equalTo(true))
 	}
 
+	@Suppress("UNCHECKED_CAST")
 	private fun <T> getInjected(clazz: Class<T>, annotation: Annotation? = null): T? =
 			injected[TypeLiteral.get(clazz) to annotation] as? T
 
@@ -225,7 +227,7 @@ class SonePluginTest {
 			mutableMapOf<Pair<TypeLiteral<*>, Annotation?>, Any>()
 
 	private val injector = mock<Injector>().apply {
-		fun mockValue(clazz: Class<*>) = false.takeIf { clazz.name == java.lang.Boolean::class.java.name } ?: mock(clazz)
+		fun mockValue(clazz: Class<*>) = false.takeIf { clazz.name == Boolean::class.javaObjectType.name } ?: mock(clazz)
 		whenever(getInstance(any<Key<*>>())).then {
 			injected.getOrPut((it.getArgument(0) as Key<*>).let { it.typeLiteral to it.annotation }) {
 				it.getArgument<Key<*>>(0).typeLiteral.type.typeName.toClass().let(::mockValue)

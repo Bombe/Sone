@@ -258,7 +258,7 @@ class SearchPageTest : WebPageTest({ webInterface, loaders, templateRenderer -> 
 		createSoneWithPost("without-match", "no match")
 		addHttpRequestParameter("query", "recipient")
 		verifyNoRedirect {
-			assertThat(this["postHits"], contains<Post>(postWithMatch))
+			assertThat(get<Iterable<Post>>("postHits"), contains(postWithMatch))
 		}
 	}
 
@@ -270,7 +270,7 @@ class SearchPageTest : WebPageTest({ webInterface, loaders, templateRenderer -> 
 		createSoneWithPost("without-match", "no match")
 		addHttpRequestParameter("query", "value")
 		verifyNoRedirect {
-			assertThat(this["soneHits"], contains(soneWithProfileField))
+			assertThat(get<Iterable<Sone>>("soneHits"), contains(soneWithProfileField))
 		}
 	}
 
@@ -282,7 +282,7 @@ class SearchPageTest : WebPageTest({ webInterface, loaders, templateRenderer -> 
 		addHttpRequestParameter("query", "sone")
 		verifyNoRedirect {
 			assertThat(this["sonePagination"], isOnPage(0).hasPages(2))
-			assertThat(this["soneHits"], contains(sones[0], sones[2]))
+			assertThat(get<Iterable<Sone>>("soneHits"), contains(sones[0], sones[2]))
 		}
 	}
 
@@ -295,7 +295,7 @@ class SearchPageTest : WebPageTest({ webInterface, loaders, templateRenderer -> 
 		addHttpRequestParameter("sonePage", "1")
 		verifyNoRedirect {
 			assertThat(this["sonePagination"], isOnPage(1).hasPages(2))
-			assertThat(this["soneHits"], contains(sones[3]))
+			assertThat(get<Iterable<Sone>>("soneHits"), contains(sones[3]))
 		}
 	}
 
@@ -306,7 +306,7 @@ class SearchPageTest : WebPageTest({ webInterface, loaders, templateRenderer -> 
 		addHttpRequestParameter("query", "sone")
 		verifyNoRedirect {
 			assertThat(this["postPagination"], isOnPage(0).hasPages(2))
-			assertThat(this["postHits"], contains(sones[0], sones[2]))
+			assertThat(get<Iterable<Post>>("postHits"), contains(sones[0], sones[2]))
 		}
 	}
 
@@ -318,7 +318,7 @@ class SearchPageTest : WebPageTest({ webInterface, loaders, templateRenderer -> 
 		addHttpRequestParameter("postPage", "1")
 		verifyNoRedirect {
 			assertThat(this["postPagination"], isOnPage(1).hasPages(2))
-			assertThat(this["postHits"], contains(sones[3]))
+			assertThat(get<Iterable<Sone>>("postHits"), contains(sones[3]))
 		}
 	}
 
@@ -331,7 +331,7 @@ class SearchPageTest : WebPageTest({ webInterface, loaders, templateRenderer -> 
 		addSone("sone", sone)
 		addHttpRequestParameter("query", "text")
 		verifyNoRedirect {
-			assertThat(this["postHits"], contains(post))
+			assertThat(get<Iterable<Post>>("postHits"), contains(post))
 		}
 		verifyNoRedirect {
 			assertThat(callCounter.get(), equalTo(1))
@@ -347,7 +347,7 @@ class SearchPageTest : WebPageTest({ webInterface, loaders, templateRenderer -> 
 		addSone("sone", sone)
 		addHttpRequestParameter("query", "text")
 		verifyNoRedirect {
-			assertThat(this["postHits"], contains(post))
+			assertThat(get<Iterable<Post>>("postHits"), contains(post))
 		}
 		whenever(ticker.read()).thenReturn(TimeUnit.MINUTES.toNanos(5) + 1)
 		verifyNoRedirect {

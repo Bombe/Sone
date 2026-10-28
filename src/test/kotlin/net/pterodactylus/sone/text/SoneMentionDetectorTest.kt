@@ -100,14 +100,14 @@ class SoneMentionDetectorTest {
 
 	@Test
 	fun `detector does not emit event for reply that contains no sones`() {
-		val reply = emptyPostReply()
+		val reply = createPostReply()
 		eventBus.post(NewPostReplyFoundEvent(reply))
 		assertThat(capturedFoundEvents, emptyIterable())
 	}
 
 	@Test
 	fun `detector does not emit event for reply that contains two links to remote sones`() {
-		val reply = emptyPostReply("text mentions sone://${remoteSone1.id} and sone://${remoteSone2.id}.")
+		val reply = createPostReply("text mentions sone://${remoteSone1.id} and sone://${remoteSone2.id}.")
 		eventBus.post(NewPostReplyFoundEvent(reply))
 		assertThat(capturedFoundEvents, emptyIterable())
 	}
@@ -115,7 +115,7 @@ class SoneMentionDetectorTest {
 	@Test
 	fun `detector emits event on reply that contains links to a remote and a local sone`() {
 		val post = createPost()
-		val reply = emptyPostReply("text mentions sone://${remoteSone1.id} and sone://${localSone1.id}.", post)
+		val reply = createPostReply("text mentions sone://${remoteSone1.id} and sone://${localSone1.id}.", post)
 		eventBus.post(NewPostReplyFoundEvent(reply))
 		assertThat(capturedFoundEvents, contains(MentionOfLocalSoneFoundEvent(post)))
 	}
@@ -123,7 +123,7 @@ class SoneMentionDetectorTest {
 	@Test
 	fun `detector emits one event on reply that contains two links to the same local sone`() {
 		val post = createPost()
-		val reply = emptyPostReply("text mentions sone://${localSone1.id} and sone://${localSone1.id}.", post)
+		val reply = createPostReply("text mentions sone://${localSone1.id} and sone://${localSone1.id}.", post)
 		eventBus.post(NewPostReplyFoundEvent(reply))
 		assertThat(capturedFoundEvents, contains(MentionOfLocalSoneFoundEvent(post)))
 	}
@@ -131,21 +131,21 @@ class SoneMentionDetectorTest {
 	@Test
 	fun `detector emits one event on reply that contains two links to local sones`() {
 		val post = createPost()
-		val reply = emptyPostReply("text mentions sone://${localSone1.id} and sone://${localSone2.id}.", post)
+		val reply = createPostReply("text mentions sone://${localSone1.id} and sone://${localSone2.id}.", post)
 		eventBus.post(NewPostReplyFoundEvent(reply))
 		assertThat(capturedFoundEvents, contains(MentionOfLocalSoneFoundEvent(post)))
 	}
 
 	@Test
 	fun `detector does not emit event for reply by local sone`() {
-		val reply = emptyPostReply("text mentions sone://${localSone1.id} and sone://${localSone2.id}.", sone = localSone1)
+		val reply = createPostReply("text mentions sone://${localSone1.id} and sone://${localSone2.id}.", sone = localSone1)
 		eventBus.post(NewPostReplyFoundEvent(reply))
 		assertThat(capturedFoundEvents, emptyIterable())
 	}
 
 	@Test
 	fun `detector does not emit event for reply without post`() {
-		val reply = emptyPostReply("text mentions sone://${localSone1.id} and sone://${localSone2.id}.", post = null)
+		val reply = createPostReply("text mentions sone://${localSone1.id} and sone://${localSone2.id}.", post = null)
 		eventBus.post(NewPostReplyFoundEvent(reply))
 		assertThat(caughtExceptions, emptyIterable())
 		assertThat(capturedFoundEvents, emptyIterable())
@@ -184,7 +184,7 @@ class SoneMentionDetectorTest {
 	@Test
 	fun `detector does emit removed event when reply with mention is removed and no more mentions in that post exist`() {
 		val post = createPost()
-		val reply = emptyPostReply("sone://${localSone1.id}", post)
+		val reply = createPostReply("sone://${localSone1.id}", post)
 		postReplyProvider.postReplies[post.id] = listOf(reply)
 		eventBus.post(NewPostReplyFoundEvent(reply))
 		eventBus.post(PostReplyRemovedEvent(reply))
@@ -194,7 +194,7 @@ class SoneMentionDetectorTest {
 	@Test
 	fun `detector does not emit removed event when reply with mention is removed and post mentions local sone`() {
 		val post = createPost("sone://${localSone1.id}")
-		val reply = emptyPostReply("sone://${localSone1.id}", post)
+		val reply = createPostReply("sone://${localSone1.id}", post)
 		eventBus.post(NewPostReplyFoundEvent(reply))
 		eventBus.post(PostReplyRemovedEvent(reply))
 		assertThat(capturedRemovedEvents, emptyIterable())
@@ -203,7 +203,7 @@ class SoneMentionDetectorTest {
 	@Test
 	fun `detector does emit removed event when reply with mention is removed and post mentions local sone but is known`() {
 		val post = createPost("sone://${localSone1.id}", known = true)
-		val reply = emptyPostReply("sone://${localSone1.id}", post)
+		val reply = createPostReply("sone://${localSone1.id}", post)
 		eventBus.post(NewPostReplyFoundEvent(reply))
 		eventBus.post(PostReplyRemovedEvent(reply))
 		assertThat(capturedRemovedEvents, contains(MentionOfLocalSoneRemovedEvent(post)))
@@ -212,8 +212,8 @@ class SoneMentionDetectorTest {
 	@Test
 	fun `detector does not emit removed event when reply with mention is removed and post has other replies with mentions`() {
 		val post = createPost()
-		val reply1 = emptyPostReply("sone://${localSone1.id}", post)
-		val reply2 = emptyPostReply("sone://${localSone1.id}", post)
+		val reply1 = createPostReply("sone://${localSone1.id}", post)
+		val reply2 = createPostReply("sone://${localSone1.id}", post)
 		postReplyProvider.postReplies[post.id] = listOf(reply1, reply2)
 		eventBus.post(NewPostReplyFoundEvent(reply1))
 		eventBus.post(PostReplyRemovedEvent(reply1))
@@ -223,8 +223,8 @@ class SoneMentionDetectorTest {
 	@Test
 	fun `detector does emit removed event when reply with mention is removed and post has other replies with mentions which are known`() {
 		val post = createPost()
-		val reply1 = emptyPostReply("sone://${localSone1.id}", post)
-		val reply2 = emptyPostReply("sone://${localSone1.id}", post, known = true)
+		val reply1 = createPostReply("sone://${localSone1.id}", post)
+		val reply2 = createPostReply("sone://${localSone1.id}", post, known = true)
 		postReplyProvider.postReplies[post.id] = listOf(reply1, reply2)
 		eventBus.post(NewPostReplyFoundEvent(reply1))
 		eventBus.post(PostReplyRemovedEvent(reply1))

@@ -7,7 +7,7 @@ import net.pterodactylus.sone.utils.*
 import net.pterodactylus.sone.web.*
 import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.template.*
-import javax.inject.*
+import jakarta.inject.*
 
 /**
  * Page that lets the user edit the name and description of an album.

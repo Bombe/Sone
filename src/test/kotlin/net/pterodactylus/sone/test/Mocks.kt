@@ -17,13 +17,24 @@
 
 package net.pterodactylus.sone.test
 
-import com.google.common.base.*
-import freenet.crypt.*
-import freenet.keys.*
-import net.pterodactylus.sone.data.*
-import net.pterodactylus.sone.data.SoneOptions.*
-import net.pterodactylus.sone.data.impl.*
-import net.pterodactylus.sone.utils.*
+import com.google.common.base.Optional
+import freenet.crypt.DummyRandomSource
+import freenet.keys.FreenetURI
+import freenet.keys.InsertableClientSSK
+import net.pterodactylus.sone.data.Image
+import net.pterodactylus.sone.data.Post
+import net.pterodactylus.sone.data.PostReply
+import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.data.SoneOptions.DefaultSoneOptions
+import net.pterodactylus.sone.data.impl.IdOnlySone
+import net.pterodactylus.sone.data.impl.ImageImpl
+import net.pterodactylus.sone.freenet.wot.DefaultIdentity
+import net.pterodactylus.sone.freenet.wot.DefaultOwnIdentity
+import net.pterodactylus.sone.freenet.wot.Identity
+import net.pterodactylus.sone.freenet.wot.OwnIdentity
+import net.pterodactylus.sone.utils.asFreenetBase64
+import net.pterodactylus.sone.utils.asOptional
+import java.util.UUID
 
 val remoteSone1 = createRemoteSone()
 val remoteSone2 = createRemoteSone()
@@ -35,24 +46,59 @@ val createRequestUri: FreenetURI get() = InsertableClientSSK.createRandom(DummyR
 val createInsertUri: FreenetURI get() = InsertableClientSSK.createRandom(DummyRandomSource(), "").insertURI
 fun createId() = InsertableClientSSK.createRandom(DummyRandomSource(), "").uri.routingKey.asFreenetBase64
 
-fun createLocalSone(id: String? = createId()) = object : IdOnlySone(id) {
+fun createOwnIdentity(id: String = "", nickname: String = "", requestUri: String = "", insertUri: String = "", contexts: Set<String> = setOf(), properties: Map<String, String> = mapOf()): OwnIdentity =
+		DefaultOwnIdentity(id, nickname, requestUri, insertUri).apply {
+			setContexts(contexts)
+			this.properties = properties
+		}
+
+fun createIdentity(id: String = "", nickname: String = "", requestUri: String = "", contexts: Set<String> = setOf(), properties: Map<String, String> = mapOf()): Identity =
+		DefaultIdentity(id, nickname, requestUri).apply {
+			setContexts(contexts)
+			this.properties = properties
+		}
+
+fun createLocalSone(id: String = createId(), identity: Identity = createOwnIdentity(id)): Sone = object : IdOnlySone(id) {
 	private val options = DefaultSoneOptions()
+	private val friends = mutableListOf<String>()
+	override fun getIdentity(): Identity = identity
 	override fun getOptions() = options
 	override fun isLocal() = true
+	override fun getFriends() = friends
+	override fun hasFriend(friendSoneId: String) = friendSoneId in friends
 }
-fun createRemoteSone(id: String? = createId()) = IdOnlySone(id)
 
-fun createPost(text: String = "", sone: Sone = remoteSone1, known: Boolean = false, time: Long = 1): Post.EmptyPost {
-	return object : Post.EmptyPost("post-id") {
+fun createRemoteSone(id: String = createId(), identity: Identity = createIdentity(id), posts: List<Post> = emptyList(), postReplies: Set<PostReply> = emptySet(), time: Long = 0): Sone = object : IdOnlySone(id) {
+	private var posts = posts.toMutableList()
+	private var postReplies = postReplies.toMutableSet()
+	override fun getTime() = time
+	override fun getIdentity(): Identity = identity
+	override fun getPosts() = this.posts
+	override fun setPosts(posts: Collection<Post>) = this.apply {
+		this.posts.clear()
+		this.posts.addAll(posts)
+	}
+	override fun getReplies() = this.postReplies
+	override fun setReplies(replies: Collection<PostReply>) = apply {
+		this.postReplies.clear()
+		this.postReplies.addAll(replies)
+	}
+}
+
+fun createPost(text: String = "text", sone: Sone? = remoteSone1, known: Boolean = false, time: Long = 1, loaded: Boolean = true, recipient: Sone? = null, id: String = UUID.randomUUID().toString()): Post {
+	return object : Post.EmptyPost(id) {
+		override fun getRecipientId() = recipient?.id.asOptional()
+		override fun getRecipient() = recipient.asOptional()
 		override fun getSone() = sone
 		override fun getText() = text
 		override fun isKnown() = known
 		override fun getTime() = time
+		override fun isLoaded() = loaded
 	}
 }
 
-fun emptyPostReply(text: String = "", post: Post? = createPost(), sone: Sone = remoteSone1, known: Boolean = false, time: Long = 1) = object : PostReply {
-	override val id = "reply-id"
+fun createPostReply(text: String = "text", post: Post? = createPost(), sone: Sone = remoteSone1, known: Boolean = false, time: Long = 1, id: String = "reply-id") = object : PostReply {
+	override val id = id
 	override fun getSone() = sone
 	override fun getPostId() = post!!.id
 	override fun getPost(): Optional<Post> = Optional.fromNullable(post)

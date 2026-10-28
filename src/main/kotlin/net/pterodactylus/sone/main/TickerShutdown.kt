@@ -20,7 +20,7 @@ package net.pterodactylus.sone.main
 import com.google.common.eventbus.*
 import net.pterodactylus.sone.core.event.*
 import java.util.concurrent.*
-import javax.inject.*
+import jakarta.inject.*
 
 /**
  * Wrapper around all [tickers][ScheduledExecutorService] used in Sone,

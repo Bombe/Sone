@@ -115,7 +115,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	private final AtomicBoolean debug = new AtomicBoolean(false);
 
 	/** The preferences. */
-	private final Preferences preferences;
+	private final DefaultPreferences preferences;
 
 	/** The event bus. */
 	private final EventBus eventBus;
@@ -196,7 +196,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		this.database = database;
 		this.metricRegistry = metricRegistry;
 		this.soneUriCreator = soneUriCreator;
-		preferences = new Preferences(eventBus);
+		preferences = new DefaultPreferences(eventBus);
 		this.configurationSaveTimeHistogram = metricRegistry.histogram("configuration.save.duration", () -> new Histogram(new ExponentiallyDecayingReservoir(3000, 0)));
 	}
 
@@ -228,7 +228,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 *
 	 * @return The options of the core
 	 */
-	public Preferences getPreferences() {
+	public DefaultPreferences getPreferences() {
 		return preferences;
 	}
 
@@ -1581,13 +1581,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		OwnIdentity ownIdentity = identityRemovedEvent.getOwnIdentity();
 		Identity identity = identityRemovedEvent.getIdentity();
 		trustedIdentities.remove(ownIdentity, identity);
-		for (Entry<OwnIdentity, Collection<Identity>> trustedIdentity : trustedIdentities.asMap().entrySet()) {
-			if (trustedIdentity.getKey().equals(ownIdentity)) {
-				continue;
-			}
-			if (trustedIdentity.getValue().contains(identity)) {
-				return;
-			}
+		if (otherOwnIdentityStillKnowsIdentity(ownIdentity, identity)) {
+			return;
 		}
 		Sone sone = getSone(identity.getId());
 		if (sone == null) {
@@ -1602,6 +1597,10 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		}
 		eventBus.post(new SoneRemovedEvent(sone));
 		database.removeSone(sone);
+	}
+
+	private boolean otherOwnIdentityStillKnowsIdentity(OwnIdentity ownIdentity, Identity identity) {
+		return trustedIdentities.entries().stream().anyMatch(e -> !e.getKey().equals(ownIdentity) && e.getValue().equals(identity));
 	}
 
 	/**

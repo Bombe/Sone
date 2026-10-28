@@ -30,33 +30,11 @@ class IdentityLoader @Inject constructor(private val webOfTrustConnector: WebOfT
 
 	private val logger: Logger = Logger.getLogger(IdentityLoader::class.java.name)
 
-	@Throws(WebOfTrustException::class)
-	fun loadTrustedIdentities() =
-			time({ stopwatch, identities -> "Loaded ${identities.size} own identities in ${stopwatch.elapsed(MILLISECONDS) / 1000.0}s." }) {
-				webOfTrustConnector.loadAllOwnIdentities()
-			}.let(this::loadTrustedIdentitiesForOwnIdentities)
-
 	fun loadAllIdentities() =
 			time({ stopwatch, identities -> "Loaded ${identities.size} own identities in ${stopwatch.elapsed(MILLISECONDS) / 1000.0}s." }) {
 				webOfTrustConnector.loadAllOwnIdentities()
 			}.let(this::loadAllIdentitiesForOwnIdentities)
-
-	@Throws(PluginException::class)
-	private fun loadTrustedIdentitiesForOwnIdentities(ownIdentities: Collection<OwnIdentity>) =
-			ownIdentities
-					.also { logger.fine { "Getting trusted identities for ${it.size} own identities..." } }
-					.associateWith { ownIdentity ->
-						logger.fine { "Getting trusted identities for $ownIdentity..." }
-						if (ownIdentity.doesNotHaveCorrectContext()) {
-							logger.fine { "Skipping $ownIdentity because of incorrect context." }
-							emptySet()
-						} else {
-							logger.fine { "Loading trusted identities for $ownIdentity from WoT..." }
-							time({ stopwatch, identities -> "Loaded ${identities.size} identities for ${ownIdentity.nickname} in ${stopwatch.elapsed(MILLISECONDS) / 1000.0}s." }) {
-								webOfTrustConnector.loadTrustedIdentities(ownIdentity, context?.context)
-							}
-						}
-					}
+					.mergeRemoteIdentities()
 
 	private fun loadAllIdentitiesForOwnIdentities(ownIdentities: Collection<OwnIdentity>) =
 			ownIdentities
@@ -81,5 +59,18 @@ class IdentityLoader @Inject constructor(private val webOfTrustConnector: WebOfT
 			Stopwatch.createStarted().let { stopwatch ->
 				loader().also { logger.fine(logMessage(stopwatch, it)) }
 			}
+
+	private fun Map<OwnIdentity, Set<Identity>>.mergeRemoteIdentities() =
+			values.flatten()
+					.groupBy { it.id }
+					.mapValues {
+						it.value.reduce { accIdentity, identity ->
+							identity.trust.forEach { (ownIdentity, trust) -> accIdentity.setTrust(ownIdentity, trust) }
+							accIdentity
+						}
+					}
+					.let { reducedIdentities ->
+						mapValues { it.value.map { identity -> reducedIdentities[identity.id]!! }.toSet() }
+					}
 
 }

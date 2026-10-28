@@ -17,6 +17,7 @@
 
 package net.pterodactylus.sone.data;
 
+import java.net.MalformedURLException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -27,6 +28,9 @@ import javax.annotation.Nullable;
 import net.pterodactylus.sone.freenet.wot.Identity;
 
 import freenet.keys.FreenetURI;
+
+import static java.lang.String.format;
+import static net.pterodactylus.sone.data.SoneKt.niceNameComparator;
 
 /**
  * A Sone defines everything about a user: her profile, her status updates, her
@@ -81,7 +85,19 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 * @return The request URI of this Sone
 	 */
 	@Nonnull
-	FreenetURI getRequestUri();
+	default FreenetURI getRequestUri() {
+		try {
+			return new FreenetURI(getIdentity().getRequestUri())
+					.setKeyType("USK")
+					.setDocName("Sone")
+					.setMetaString(new String[0])
+					.setSuggestedEdition(getLatestEdition());
+		} catch (MalformedURLException e) {
+			throw new IllegalStateException(
+					format("Identity %s's request URI is incorrect.",
+							getIdentity()), e);
+		}
+	}
 
 	/**
 	 * Returns the latest edition of this Sone.
@@ -396,5 +412,10 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 */
 	/* TODO - remove this method again, maybe add an option provider */
 	void setOptions(@Nonnull SoneOptions options);
+
+	@Override
+	default int compareTo(@Nonnull Sone sone) {
+		return niceNameComparator().compare(this, sone);
+	}
 
 }

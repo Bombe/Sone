@@ -16,14 +16,13 @@ import net.pterodactylus.sone.web.FreenetSessionProvider
 import net.pterodactylus.sone.web.SessionProvider
 import net.pterodactylus.util.config.*
 import net.pterodactylus.util.config.ConfigurationException
-import net.pterodactylus.util.logging.*
 import net.pterodactylus.util.version.Version
 import java.io.*
 import java.util.concurrent.*
 import java.util.concurrent.Executors.*
-import java.util.logging.*
-import javax.inject.*
-import javax.inject.Singleton
+import java.util.logging.Logger
+import jakarta.inject.*
+import jakarta.inject.Singleton
 
 open class SoneModule(private val sonePlugin: SonePlugin, private val eventBus: EventBus) : AbstractModule() {
 
@@ -59,7 +58,7 @@ open class SoneModule(private val sonePlugin: SonePlugin, private val eventBus: 
 		bind(PluginYear::class.java).toInstance(PluginYear(sonePlugin.year))
 		bind(PluginHomepage::class.java).toInstance(PluginHomepage(sonePlugin.homepage))
 		bind(Database::class.java).to(MemoryDatabase::class.java).`in`(Singleton::class.java)
-		bind(Translation::class.java).toInstance(BaseL10nTranslation(sonePlugin.l10n().base))
+		bind(Translation::class.java).toInstance(BaseL10nTranslation { sonePlugin.l10n().base })
 		loaders?.let { bind(Loaders::class.java).toInstance(it) }
 		bind(MetricRegistry::class.java).`in`(Singleton::class.java)
 		bind(WebOfTrustConnector::class.java).to(PluginWebOfTrustConnector::class.java).`in`(Singleton::class.java)
@@ -68,7 +67,7 @@ open class SoneModule(private val sonePlugin: SonePlugin, private val eventBus: 
 		bind(SessionProvider::class.java).to(FreenetSessionProvider::class.java).`in`(Singleton::class.java)
 
 		bindListener(Matchers.any(), object : TypeListener {
-			override fun <I> hear(typeLiteral: TypeLiteral<I>, typeEncounter: TypeEncounter<I>) {
+			override fun <I : Any> hear(typeLiteral: TypeLiteral<I>, typeEncounter: TypeEncounter<I>) {
 				typeEncounter.register(InjectionListener { injectee ->
 					logger.fine { "Injecting $injectee..." }
 					eventBus.register(injectee)
@@ -83,7 +82,7 @@ open class SoneModule(private val sonePlugin: SonePlugin, private val eventBus: 
 	fun getNotificationTicker(): ScheduledExecutorService =
 			newSingleThreadScheduledExecutor()
 
-	private val logger: Logger = Logging.getLogger(javaClass)
+	private val logger: Logger = Logger.getLogger(javaClass.name)
 
 }
 

@@ -19,7 +19,7 @@ package net.pterodactylus.sone.web.page
 
 import freenet.client.*
 import net.pterodactylus.util.web.*
-import javax.inject.*
+import jakarta.inject.*
 
 class PageToadletFactory @Inject constructor(
 		private val highLevelSimpleClient: HighLevelSimpleClient,

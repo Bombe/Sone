@@ -1058,12 +1058,47 @@ function checkForRemovedReplies(oldNotification, newNotification) {
 	});
 }
 
+/**
+ * The URLs of not-loaded elements are part of the GET request’s URL. As
+ * both browsers and HTTP servers do have differing limits on URL length
+ * (the HTTP 1.1 RFC states 8000 bytes but most browsers only support up
+ * to 2000 bytes) we will return a random selection of not-loaded URLs we
+ * want to refresh the status from up until we are at approximately 1000
+ * bytes (as the rest of the URL also needs some space).
+ *
+ * @return An array of not-loaded element URLs that will have a total length
+ * of 1000 bytes or fewer
+ */
+function getRandomSelectionOfElementsToUpdate() {
+	const notLoadedElementUrls = $(".linked-element.not-loaded").map(function(_, element) {
+		return $(element).prop("title");
+	}).toArray();
+	shuffleArray(notLoadedElementUrls);
+	const selectedElementUrls = Array();
+	let currentCombinedStringLength = 0;
+	$(notLoadedElementUrls).each(function(_, elementUrl) {
+		if ((currentCombinedStringLength + elementUrl.length) <= 1000) {
+			selectedElementUrls.push(elementUrl);
+			currentCombinedStringLength += elementUrl.length;
+		}
+	});
+	return selectedElementUrls;
+}
+
+// shamelessly stolen from https://stackoverflow.com/a/12646864/43582
+function shuffleArray(array) {
+	for (let i = array.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		const temp = array[i];
+		array[i] = array[j];
+		array[j] = temp;
+	}
+}
+
 function getStatus() {
 	const parameters = isViewSonePage() ? {"soneIds": getShownSoneId()} : isKnownSonesPage() ? {"soneIds": getShownSoneIds()} : {};
 	$.extend(parameters, {
-		"elements": JSON.stringify($(".linked-element.not-loaded").map(function () {
-			return $(this).prop("title");
-		}).toArray())
+		"elements": JSON.stringify(getRandomSelectionOfElementsToUpdate())
 	});
 	ajaxGet("getStatus.ajax", parameters, function(data) {
 		if ((data != null) && data.success) {

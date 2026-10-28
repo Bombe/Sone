@@ -7,6 +7,7 @@ import net.pterodactylus.sone.data.Sone.SoneStatus.downloading
 import net.pterodactylus.sone.data.Sone.SoneStatus.inserting
 import net.pterodactylus.sone.freenet.L10nFilter
 import net.pterodactylus.sone.freenet.L10nText
+import net.pterodactylus.sone.test.OverrideLocale
 import net.pterodactylus.sone.test.deepMock
 import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.isProvidedByMock
@@ -15,6 +16,7 @@ import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.text.TimeText
 import net.pterodactylus.sone.text.TimeTextConverter
 import net.pterodactylus.sone.utils.jsonArray
+import net.pterodactylus.sone.web.NewElements
 import net.pterodactylus.sone.web.baseInjector
 import net.pterodactylus.util.notify.Notification
 import org.hamcrest.MatcherAssert.assertThat
@@ -25,9 +27,11 @@ import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.hasEntry
 import org.hamcrest.Matchers.notNullValue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.anyLong
+import java.util.Locale.ENGLISH
 import java.util.TimeZone
 
 /**
@@ -35,9 +39,12 @@ import java.util.TimeZone
  */
 class GetStatusAjaxPageTest: JsonPageTest("getStatus.ajax", requiresLogin = false, needsFormPassword = false) {
 
+	@get:Rule
+	val overrideLocale = OverrideLocale(ENGLISH)
+
 	private val timeTextConverter = mock<TimeTextConverter>()
 	private val l10nFilter = mock<L10nFilter>()
-	override var page: JsonPage = GetStatusAjaxPage(webInterface, elementLoader, timeTextConverter, l10nFilter, TimeZone.getTimeZone("UTC"))
+	override var page: JsonPage = GetStatusAjaxPage(webInterface, elementLoader, newElements, timeTextConverter, l10nFilter, TimeZone.getTimeZone("UTC"))
 
 	@Before
 	fun setupTimeTextConverter() {

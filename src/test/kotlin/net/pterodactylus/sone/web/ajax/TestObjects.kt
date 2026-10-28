@@ -8,7 +8,7 @@ import freenet.support.api.HTTPRequest
 import net.pterodactylus.sone.core.Core
 import net.pterodactylus.sone.core.ElementLoader
 import net.pterodactylus.sone.core.LinkedElement
-import net.pterodactylus.sone.core.Preferences
+import net.pterodactylus.sone.core.DefaultPreferences
 import net.pterodactylus.sone.core.UpdateChecker
 import net.pterodactylus.sone.data.Album
 import net.pterodactylus.sone.data.Image
@@ -25,10 +25,10 @@ import net.pterodactylus.sone.test.get
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.utils.asOptional
+import net.pterodactylus.sone.web.NewElements
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.notify.Notification
-import net.pterodactylus.util.template.TemplateContextFactory
 import net.pterodactylus.util.web.Method.GET
 import net.pterodactylus.util.web.Method.POST
 import org.mockito.ArgumentMatchers
@@ -46,9 +46,10 @@ open class TestObjects {
 	var formPassword = "form-password"
 	val core = mock<Core>()
 	val eventBus = mock<EventBus>()
-	val preferences = Preferences(eventBus)
+	val preferences = DefaultPreferences(eventBus)
 	val updateChecker = mock<UpdateChecker>()
 	val elementLoader = mock<ElementLoader>()
+	val newElements = mock<NewElements>()
 
 	val toadletContext = mock<ToadletContext>()
 	val freenetRequest = mock<FreenetRequest>()
@@ -79,14 +80,11 @@ open class TestObjects {
 	}
 
 	init {
-		whenever(webInterface.templateContextFactory).thenReturn(TemplateContextFactory())
 		whenever(webInterface.getCurrentSone(ArgumentMatchers.eq(toadletContext))).thenReturn(currentSone)
 		whenever(webInterface.core).thenReturn(core)
 		whenever(webInterface.formPassword).then { formPassword }
 		whenever(webInterface.getNotifications(currentSone)).thenAnswer { notifications.values }
 		whenever(webInterface.getNotification(ArgumentMatchers.anyString())).then { notifications[it[0]].asOptional() }
-		whenever(webInterface.getNewPosts(currentSone)).thenAnswer { newPosts.values }
-		whenever(webInterface.getNewReplies(currentSone)).thenAnswer { newReplies.values }
 		whenever(webInterface.translation).thenReturn(translation)
 
 		whenever(core.preferences).thenReturn(preferences)
@@ -105,6 +103,9 @@ open class TestObjects {
 			linkedElements[it.getArgument(0)] ?: LinkedElement(it.getArgument(0), loading = true)
 		}
 
+		whenever(newElements.newPosts).then { newPosts.values }
+		whenever(newElements.newReplies).then { newReplies.values }
+
 		whenever(currentSone.options).thenReturn(DefaultSoneOptions())
 		currentSone.mock("soneId", "Sone_Id", true, 1000, idle)
 
@@ -113,7 +114,7 @@ open class TestObjects {
 		whenever(freenetRequest.httpRequest).thenReturn(httpRequest)
 
 		whenever(httpRequest.method).thenReturn("GET")
-		whenever(httpRequest.getHeader(ArgumentMatchers.anyString())).thenAnswer { requestHeaders[it.get<String>(0).toLowerCase()] }
+		whenever(httpRequest.getHeader(ArgumentMatchers.anyString())).thenAnswer { requestHeaders[it.get<String>(0).lowercase(Locale.US)] }
 		whenever(httpRequest.getParam(ArgumentMatchers.anyString())).thenAnswer { requestParameters[it.getArgument(0)] ?: "" }
 		whenever(httpRequest.getParam(ArgumentMatchers.anyString(), ArgumentMatchers.anyString())).thenAnswer { requestParameters[it.getArgument(0)] ?: it.getArgument(1) }
 		whenever(httpRequest.getParam(ArgumentMatchers.anyString(), ArgumentMatchers.isNull())).thenAnswer { requestParameters[it.getArgument(0)] }
@@ -146,7 +147,7 @@ open class TestObjects {
 	}
 
 	protected fun addRequestHeader(key: String, value: String) {
-		requestHeaders += key.toLowerCase() to value
+		requestHeaders += key.lowercase(Locale.US) to value
 	}
 
 	protected fun addRequestParameter(key: String, value: String) {

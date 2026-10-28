@@ -98,11 +98,11 @@ class SoneTest {
 	fun `post count comparator compares replies if posts are not different`() {
 		val sone1 = object : IdOnlySone("1") {
 			override fun getPosts() = listOf(createPost(), createPost())
-			override fun getReplies() = setOf(emptyPostReply(), emptyPostReply())
+			override fun getReplies() = setOf(createPostReply(), createPostReply())
 		}
 		val sone2 = object : IdOnlySone("2") {
 			override fun getPosts() = listOf(createPost(), createPost())
-			override fun getReplies() = setOf(emptyPostReply(), emptyPostReply(), emptyPostReply())
+			override fun getReplies() = setOf(createPostReply(), createPostReply(), createPostReply())
 		}
 		assertThat(postCountComparator.compare(sone1, sone2), greaterThan(0))
 	}
@@ -111,11 +111,11 @@ class SoneTest {
 	fun `post count comparator sorts sone with same amount of posts and replies as equal`() {
 		val sone1 = object : IdOnlySone("1") {
 			override fun getPosts() = listOf(createPost(), createPost())
-			override fun getReplies() = setOf(emptyPostReply(), emptyPostReply())
+			override fun getReplies() = setOf(createPostReply(), createPostReply())
 		}
 		val sone2 = object : IdOnlySone("2") {
 			override fun getPosts() = listOf(createPost(), createPost())
-			override fun getReplies() = setOf(emptyPostReply(), emptyPostReply())
+			override fun getReplies() = setOf(createPostReply(), createPostReply())
 		}
 		assertThat(postCountComparator.compare(sone1, sone2), equalTo(0))
 	}

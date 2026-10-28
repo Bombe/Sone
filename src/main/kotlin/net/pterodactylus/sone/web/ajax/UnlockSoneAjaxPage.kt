@@ -3,7 +3,7 @@ package net.pterodactylus.sone.web.ajax
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 /**
  * Lets the user [unlock][net.pterodactylus.sone.core.Core.unlockSone] a [Sone][net.pterodactylus.sone.data.Sone].

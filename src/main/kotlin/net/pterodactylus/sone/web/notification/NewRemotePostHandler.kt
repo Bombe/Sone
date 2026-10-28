@@ -22,7 +22,7 @@ import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.notify.*
 import net.pterodactylus.util.notify.*
-import javax.inject.*
+import jakarta.inject.*
 
 /**
  * Handler for [NewPostFoundEvent]s that adds the new post to the “new posts” notification and

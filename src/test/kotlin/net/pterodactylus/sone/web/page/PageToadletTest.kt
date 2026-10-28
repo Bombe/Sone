@@ -200,6 +200,7 @@ private open class DelegatingToadletContext(private val toadletContext: ToadletC
 	override fun sendReplyHeaders(code: Int, desc: String?, mvt: MultiValueTable<String, String>?, mimeType: String?, length: Long) = toadletContext.sendReplyHeaders(code, desc, mvt, mimeType, length)
 	override fun sendReplyHeaders(code: Int, desc: String?, mvt: MultiValueTable<String, String>?, mimeType: String?, length: Long, forceDisableJavascript: Boolean) = toadletContext.sendReplyHeaders(code, desc, mvt, mimeType, length, forceDisableJavascript)
 	@Suppress("DEPRECATION")
+	@Deprecated("Deprecated in ToadletContext")
 	override fun sendReplyHeaders(code: Int, desc: String?, mvt: MultiValueTable<String, String>?, mimeType: String?, length: Long, mTime: Date?) = toadletContext.sendReplyHeaders(code, desc, mvt, mimeType, length, mTime)
 	override fun getUri(): URI = toadletContext.uri
 	override fun getPageMaker(): PageMaker = toadletContext.pageMaker

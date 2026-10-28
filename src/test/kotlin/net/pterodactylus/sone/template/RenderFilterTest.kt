@@ -108,7 +108,7 @@ class RenderFilterTest {
 	private fun setupPost(sone: Sone, value: String) =
 			mock<Post>().apply {
 				whenever(id).thenReturn(POST_ID)
-				whenever(this.sone).thenReturn(this@RenderFilterTest.sone)
+				whenever(this.sone).thenReturn(sone)
 				whenever(text).thenReturn(value)
 			}
 

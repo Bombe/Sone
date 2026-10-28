@@ -17,13 +17,19 @@
 
 package net.pterodactylus.sone.template
 
+import net.pterodactylus.sone.test.OverrideLocale
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
+import org.junit.Rule
+import java.util.Locale.ENGLISH
 import kotlin.test.*
 
 class DurationFormatFilterTest {
 
 	private val filter = DurationFormatFilter()
+
+	@get:Rule
+	val overrideLocale = OverrideLocale(ENGLISH)
 
 	@Test
 	fun `random object is returned as it is`() {

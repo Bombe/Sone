@@ -24,6 +24,7 @@ import static java.util.logging.Logger.getLogger;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +32,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import net.pterodactylus.sone.core.event.ImageInsertAbortedEvent;
 import net.pterodactylus.sone.core.event.ImageInsertFailedEvent;
@@ -42,6 +43,8 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.TemporaryImage;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Singleton;
 
@@ -63,6 +66,7 @@ import freenet.client.async.ClientPutCallback;
 import freenet.client.async.ClientPutter;
 import freenet.client.async.SnoopMetadata;
 import freenet.client.async.USKCallback;
+import freenet.client.async.USKManager;
 import freenet.keys.FreenetURI;
 import freenet.keys.InsertableClientSSK;
 import freenet.keys.USK;
@@ -90,6 +94,8 @@ public class FreenetInterface {
 
 	/** The node to interact with. */
 	private final Node node;
+	private final USKManager uskManager;
+	private final ClientContext clientContext;
 
 	private final SoneUriCreator soneUriCreator;
 
@@ -98,7 +104,7 @@ public class FreenetInterface {
 	private final RequestClient requestClient = new RequestClientBuilder().realTime().build();
 
 	/** The USK callbacks. */
-	private final Map<String, USKCallback> soneUskCallbacks = new HashMap<>();
+	private final Multimap<String, USKCallback> soneUskCallbacks = ArrayListMultimap.create();
 
 	/** The not-Sone-related USK callbacks. */
 	private final Map<FreenetURI, USKCallback> uriUskCallbacks = Collections.synchronizedMap(new HashMap<FreenetURI, USKCallback>());
@@ -107,11 +113,13 @@ public class FreenetInterface {
 	private final RequestClient imageLoader = new RequestClientBuilder().realTime().build();
 
 	@Inject
-	public FreenetInterface(EventBus eventBus, Node node, SoneUriCreator soneUriCreator) {
+	public FreenetInterface(EventBus eventBus, Node node, USKManager uskManager, ClientContext clientContext, SoneUriCreator soneUriCreator, HighLevelSimpleClientCreator highLevelSimpleClientCreator) {
 		this.eventBus = eventBus;
 		this.node = node;
+		this.uskManager = uskManager;
+		this.clientContext = clientContext;
 		this.soneUriCreator = soneUriCreator;
-		this.client = node.clientCore.makeClient(RequestStarter.INTERACTIVE_PRIORITY_CLASS, false, true);
+		this.client = highLevelSimpleClientCreator.makeClient(RequestStarter.INTERACTIVE_PRIORITY_CLASS, false, true);
 	}
 
 	//
@@ -171,8 +179,12 @@ public class FreenetInterface {
 		SnoopMetadata snoop = new SnoopMetadata() {
 			@Override
 			public boolean snoopMetadata(Metadata meta, ClientContext context) {
-				String mimeType = meta.getMIMEType();
-				boolean cancel = (mimeType == null) || backgroundFetchCallback.shouldCancel(uri, mimeType, meta.dataLength());
+				if (meta.isArchiveManifest()) {
+					return false;
+				}
+				Metadata actualMetadata = meta.isSimpleManifest() ? meta.getDocuments().values().stream().findFirst().get() : meta;
+				String mimeType = actualMetadata.getMIMEType();
+				boolean cancel = (mimeType == null) || backgroundFetchCallback.shouldCancel(uri, mimeType, actualMetadata.dataLength());
 				if (cancel) {
 					backgroundFetchCallback.failed(uri);
 				}
@@ -180,10 +192,11 @@ public class FreenetInterface {
 			}
 		};
 		FetchContext fetchContext = client.getFetchContext();
+		fetchContext.dontEnterImplicitArchives = false;
 		try {
 			ClientGetter clientGetter = client.fetch(uri, 2097152, callback, fetchContext, RequestStarter.INTERACTIVE_PRIORITY_CLASS);
 			clientGetter.setMetaSnoop(snoop);
-			clientGetter.restart(uri, fetchContext.filterData, node.clientCore.clientContext);
+			clientGetter.restart(uri, fetchContext.filterData, clientContext);
 		} catch (FetchException fe) {
 			/* stupid exception that can not actually be thrown! */
 		}
@@ -211,7 +224,7 @@ public class FreenetInterface {
 	 */
 	public void insertImage(TemporaryImage temporaryImage, Image image, InsertToken insertToken) throws SoneException {
 		String filenameHint = image.getId() + "." + temporaryImage.getMimeType().substring(temporaryImage.getMimeType().lastIndexOf("/") + 1);
-		InsertableClientSSK key = InsertableClientSSK.createRandom(node.random, "");
+		InsertableClientSSK key = InsertableClientSSK.createRandom(node.getRandom(), "");
 		FreenetURI targetUri = key.getInsertURI().setDocName(filenameHint);
 		InsertContext insertContext = client.getInsertContext(true);
 		RandomAccessBucket bucket = new ArrayBucket(temporaryImage.getImageData());
@@ -251,7 +264,7 @@ public class FreenetInterface {
 			USKCallback uskCallback) {
 		try {
 			soneUskCallbacks.put(FreenetURIsKt.getRoutingKeyString(requestUri), uskCallback);
-			node.clientCore.uskManager.subscribe(create(requestUri),
+			uskManager.subscribe(create(requestUri),
 					uskCallback, true, requestClient);
 		} catch (MalformedURLException mue1) {
 			logger.log(WARNING, format("Could not subscribe USK “%s”!",
@@ -263,9 +276,7 @@ public class FreenetInterface {
 			USKCallback uskCallback) {
 		try {
 			soneUskCallbacks.put(FreenetURIsKt.getRoutingKeyString(requestUri), uskCallback);
-			node.clientCore
-					.uskManager
-					.subscribe(create(requestUri), uskCallback, false, requestClient);
+			uskManager.subscribe(create(requestUri), uskCallback, false, requestClient);
 		} catch (MalformedURLException mue1) {
 			logger.log(WARNING,
 					format("Could not subscribe USK “%s”!", requestUri),
@@ -280,16 +291,19 @@ public class FreenetInterface {
 	 *            The Sone to unregister
 	 */
 	public void unregisterUsk(Sone sone) {
-		USKCallback uskCallback = soneUskCallbacks.remove(sone.getId());
-		if (uskCallback == null) {
+		Collection<USKCallback> uskCallbacks = soneUskCallbacks.removeAll(sone.getId());
+		if (uskCallbacks.isEmpty()) {
 			return;
 		}
-		try {
-			logger.log(Level.FINEST, String.format("Unsubscribing from USK for %s…", sone));
-			node.clientCore.uskManager.unsubscribe(USK.create(soneUriCreator.getRequestUri(sone)), uskCallback);
-		} catch (MalformedURLException mue1) {
-			logger.log(Level.FINE, String.format("Could not unsubscribe USK “%s”!", soneUriCreator.getRequestUri(sone)), mue1);
-		}
+		logger.log(Level.FINE, String.format("Unsubscribing %d from USK for %s…", uskCallbacks.size(), sone));
+		logger.log(Level.FINEST, String.format("USKs left: %d", soneUskCallbacks.size()));
+		uskCallbacks.forEach(uskCallback -> {
+			try {
+				uskManager.unsubscribe(USK.create(soneUriCreator.getRequestUri(sone)), uskCallback);
+			} catch (MalformedURLException mue1) {
+				logger.log(Level.FINE, String.format("Could not unsubscribe USK “%s”!", soneUriCreator.getRequestUri(sone)), mue1);
+			}
+		});
 	}
 
 	/**
@@ -321,7 +335,7 @@ public class FreenetInterface {
 
 		};
 		try {
-			node.clientCore.uskManager.subscribe(USK.create(uri), uskCallback, true, requestClient);
+			uskManager.subscribe(USK.create(uri), uskCallback, true, requestClient);
 			uriUskCallbacks.put(USK.create(uri).clearCopy().getURI(), uskCallback);
 		} catch (MalformedURLException mue1) {
 			logger.log(Level.WARNING, String.format("Could not subscribe to USK: %s", uri), mue1);
@@ -341,7 +355,7 @@ public class FreenetInterface {
 				logger.log(Level.INFO, String.format("Could not unregister unknown USK: %s", uri));
 				return;
 			}
-			node.clientCore.uskManager.unsubscribe(USK.create(uri), uskCallback);
+			uskManager.unsubscribe(USK.create(uri), uskCallback);
 		} catch (MalformedURLException mue1) {
 			logger.log(Level.INFO, String.format("Could not unregister invalid USK: %s", uri), mue1);
 		}
@@ -429,7 +443,7 @@ public class FreenetInterface {
 		 */
 		@SuppressWarnings("synthetic-access")
 		public void cancel() {
-			clientPutter.cancel(node.clientCore.clientContext);
+			clientPutter.cancel(clientContext);
 			eventBus.post(new ImageInsertAbortedEvent(image));
 			bucket.free();
 		}

@@ -17,20 +17,19 @@
 
 package net.pterodactylus.sone.database.memory
 
-import com.google.common.base.*
-import com.google.common.base.Optional.*
+import com.google.common.util.concurrent.RateLimiter
 import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.data.impl.*
 import net.pterodactylus.sone.test.*
 import net.pterodactylus.sone.test.Matchers.*
 import net.pterodactylus.util.config.*
 import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers
 import org.hamcrest.Matchers.*
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.*
 import org.mockito.invocation.*
 import java.util.Arrays.*
-import java.util.UUID.*
 import kotlin.test.*
 
 /**
@@ -39,7 +38,7 @@ import kotlin.test.*
 class MemoryDatabaseTest {
 
 	private val configuration = deepMock<Configuration>()
-	private val memoryDatabase = MemoryDatabase(configuration)
+	private val memoryDatabase = MemoryDatabase(configuration, RateLimiter.create(0.001))
 	private val sone = mock<Sone>()
 
 	@BeforeTest
@@ -176,45 +175,27 @@ class MemoryDatabaseTest {
 
 	@Test
 	fun `post recipients are detected correctly`() {
-		val postWithRecipient = createPost(of(RECIPIENT_ID))
+		val postWithRecipient = createPost(id = "p1", recipient = createRemoteSone(RECIPIENT_ID))
 		memoryDatabase.storePost(postWithRecipient)
-		val postWithoutRecipient = createPost(absent())
+		val postWithoutRecipient = createPost(id = "p2", recipient = null)
 		memoryDatabase.storePost(postWithoutRecipient)
-		assertThat(memoryDatabase.getDirectedPosts(RECIPIENT_ID), contains(postWithRecipient))
-	}
-
-	private fun createPost(recipient: Optional<String>): Post {
-		val postWithRecipient = mock<Post>()
-		whenever(postWithRecipient.id).thenReturn(randomUUID().toString())
-		whenever(postWithRecipient.sone).thenReturn(sone)
-		whenever(postWithRecipient.recipientId).thenReturn(recipient)
-		return postWithRecipient
+		assertThat(memoryDatabase.getDirectedPosts(RECIPIENT_ID), contains(isPost(isRecipientId = equalTo(RECIPIENT_ID))))
 	}
 
 	@Test
 	fun `post replies are managed correctly`() {
-		val firstPost = createPost(absent())
-		val firstPostFirstReply = createPostReply(firstPost, 1000L)
-		val secondPost = createPost(absent())
-		val secondPostFirstReply = createPostReply(secondPost, 1000L)
-		val secondPostSecondReply = createPostReply(secondPost, 2000L)
+		val firstPost = createPost()
+		val firstPostFirstReply = createPostReply(id = "p1r1", post = firstPost, time = 1000L)
+		val secondPost = createPost()
+		val secondPostFirstReply = createPostReply(id = "p2r1", post = secondPost, time = 1000L)
+		val secondPostSecondReply = createPostReply(id = "p2r2", post = secondPost, time = 2000L)
 		memoryDatabase.storePost(firstPost)
 		memoryDatabase.storePost(secondPost)
 		memoryDatabase.storePostReply(firstPostFirstReply)
 		memoryDatabase.storePostReply(secondPostFirstReply)
 		memoryDatabase.storePostReply(secondPostSecondReply)
-		assertThat(memoryDatabase.getReplies(firstPost.id), contains(firstPostFirstReply))
-		assertThat(memoryDatabase.getReplies(secondPost.id), contains(secondPostFirstReply, secondPostSecondReply))
-	}
-
-	private fun createPostReply(post: Post, time: Long): PostReply {
-		val postReply = mock<PostReply>()
-		whenever(postReply.id).thenReturn(randomUUID().toString())
-		whenever(postReply.time).thenReturn(time)
-		whenever(postReply.post).thenReturn(of(post))
-		val postId = post.id
-		whenever(postReply.postId).thenReturn(postId)
-		return postReply
+		assertThat(memoryDatabase.getReplies(firstPost.id).map(PostReply::id), Matchers.contains("p1r1"))
+		assertThat(memoryDatabase.getReplies(secondPost.id).map(PostReply::id), contains("p2r1", "p2r2"))
 	}
 
 	@Test
@@ -430,7 +411,6 @@ class MemoryDatabaseTest {
 	}
 
 	@Test
-	@Dirty("the rate limiter should be mocked")
 	fun `setting post replies as knows twice in a row only saves the database once`() {
 		prepareConfigurationValues()
 		val postReply = mock<PostReply>()

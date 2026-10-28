@@ -29,21 +29,19 @@ import net.pterodactylus.sone.freenet.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import org.junit.*
-import org.junit.rules.*
 import kotlin.concurrent.*
+import net.pterodactylus.sone.test.assertThrows
 
 class FredPluginConnectorTest {
 
-	@Rule
-	@JvmField
-	val expectedException = ExpectedException.none()!!
-
 	@Test
-	fun `connector throws exception if plugin can not be found`() = runBlocking {
+	fun `connector throws exception if plugin can not be found`() {
 		val pluginConnector = FredPluginConnector(pluginRespiratorFacade)
-		expectedException.expect(PluginException::class.java)
+		assertThrows<PluginException> {
+			runBlocking {
 		pluginConnector.sendRequest("wrong.plugin", requestFields, requestData)
-		Unit
+			}
+		}
 	}
 
 	@Test

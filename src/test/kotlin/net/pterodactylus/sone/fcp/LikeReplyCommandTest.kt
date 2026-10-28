@@ -6,6 +6,7 @@ import net.pterodactylus.sone.test.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import org.junit.*
+import org.junit.Assert.assertThrows
 import org.mockito.Mockito.*
 
 /**
@@ -37,31 +38,35 @@ class LikeReplyCommandTest : SoneCommandTest() {
 	@Test
 	fun `request with invalid reply results in FCP exception`() {
 		parameters += "Reply" to "InvalidReplyId"
-		expectedException.expect(FcpException::class.java)
-		command.execute(parameters)
+		assertThrows(FcpException::class.java) {
+			command.execute(parameters)
+		}
 	}
 
 	@Test
 	fun `request without sone results in FCP exception`() {
 		parameters += "Reply" to "ReplyId"
-		expectedException.expect(FcpException::class.java)
-		command.execute(parameters)
+		assertThrows(FcpException::class.java) {
+			command.execute(parameters)
+		}
 	}
 
 	@Test
 	fun `request with invalid sone results in FCP exception`() {
 		parameters += "Reply" to "ReplyId"
 		parameters += "Sone" to "InvalidSoneId"
-		expectedException.expect(FcpException::class.java)
-		command.execute(parameters)
+		assertThrows(FcpException::class.java) {
+			command.execute(parameters)
+		}
 	}
 
 	@Test
 	fun `request with remote sone results in FCP exception`() {
 		parameters += "Reply" to "ReplyId"
 		parameters += "Sone" to "RemoteSoneId"
-		expectedException.expect(FcpException::class.java)
-		command.execute(parameters)
+		assertThrows(FcpException::class.java) {
+			command.execute(parameters)
+		}
 	}
 
 	@Test

@@ -1,7 +1,7 @@
 package net.pterodactylus.sone.web
 
 import net.pterodactylus.sone.web.pages.*
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 /**
  * Container for all web pages. This uses field injection because there are way too many pages

@@ -11,7 +11,7 @@ import net.pterodactylus.util.template.*
 import java.awt.image.*
 import java.io.*
 import javax.imageio.*
-import javax.inject.*
+import jakarta.inject.*
 
 /**
  * Page implementation that lets the user upload an image.

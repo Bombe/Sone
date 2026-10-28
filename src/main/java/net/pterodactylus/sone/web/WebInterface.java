@@ -17,22 +17,15 @@
 
 package net.pterodactylus.sone.web;
 
-import static com.google.common.collect.FluentIterable.from;
-import static java.util.logging.Logger.getLogger;
-
 import java.util.Collection;
-import java.util.Set;
 import java.util.TimeZone;
-import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Named;
 
 import net.pterodactylus.sone.core.Core;
+import net.pterodactylus.sone.core.DefaultElementLoader;
 import net.pterodactylus.sone.core.ElementLoader;
 import net.pterodactylus.sone.core.event.*;
-import net.pterodactylus.sone.data.Post;
-import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.L10nFilter;
 import net.pterodactylus.sone.freenet.Translation;
@@ -41,10 +34,8 @@ import net.pterodactylus.sone.main.PluginHomepage;
 import net.pterodactylus.sone.main.PluginVersion;
 import net.pterodactylus.sone.main.PluginYear;
 import net.pterodactylus.sone.main.SonePlugin;
-import net.pterodactylus.sone.notify.ListNotification;
 import net.pterodactylus.sone.notify.ListNotificationFilter;
 import net.pterodactylus.sone.notify.PostVisibilityFilter;
-import net.pterodactylus.sone.notify.ReplyVisibilityFilter;
 import net.pterodactylus.sone.template.LinkedElementRenderFilter;
 import net.pterodactylus.sone.template.ParserFilter;
 import net.pterodactylus.sone.template.RenderFilter;
@@ -89,7 +80,6 @@ import net.pterodactylus.util.web.TemplatePage;
 
 import com.codahale.metrics.*;
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import freenet.clients.http.ToadletContext;
@@ -99,9 +89,6 @@ import freenet.clients.http.ToadletContext;
  * references to l10n helpers.
  */
 public class WebInterface implements SessionProvider {
-
-	/** The logger. */
-	private static final Logger logger = getLogger(WebInterface.class.getName());
 
 	/** The loaders for templates, pages, and classpath providers. */
 	private final Loaders loaders;
@@ -126,7 +113,6 @@ public class WebInterface implements SessionProvider {
 
 	private final ListNotificationFilter listNotificationFilter;
 	private final PostVisibilityFilter postVisibilityFilter;
-	private final ReplyVisibilityFilter replyVisibilityFilter;
 
 	private final ElementLoader elementLoader;
 	private final LinkedElementRenderFilter linkedElementRenderFilter;
@@ -138,37 +124,23 @@ public class WebInterface implements SessionProvider {
 	private final Translation translation;
 	private final SessionProvider sessionProvider;
 
-	/** The “new post” notification. */
-	private final ListNotification<Post> newPostNotification;
-
-	/** The “new reply” notification. */
-	private final ListNotification<PostReply> newReplyNotification;
-
-	/** The invisible “local post” notification. */
-	private final ListNotification<Post> localPostNotification;
-
-	/** The invisible “local reply” notification. */
-	private final ListNotification<PostReply> localReplyNotification;
+	private final NewElements newElements;
 
 	@Inject
 	public WebInterface(SonePlugin sonePlugin, Loaders loaders, ListNotificationFilter listNotificationFilter,
-			PostVisibilityFilter postVisibilityFilter, ReplyVisibilityFilter replyVisibilityFilter,
-			ElementLoader elementLoader, TemplateContextFactory templateContextFactory,
-			TemplateRenderer templateRenderer,
-			ParserFilter parserFilter, ShortenFilter shortenFilter,
-			RenderFilter renderFilter,
-			LinkedElementRenderFilter linkedElementRenderFilter,
-			PageToadletRegistry pageToadletRegistry, MetricRegistry metricRegistry, Translation translation, L10nFilter l10nFilter,
-			NotificationManager notificationManager, SessionProvider sessionProvider,
-			@Named("newRemotePost") ListNotification<Post> newPostNotification,
-			@Named("newRemotePostReply") ListNotification<PostReply> newReplyNotification,
-			@Named("localPost") ListNotification<Post> localPostNotification,
-			@Named("localReply") ListNotification<PostReply> localReplyNotification) {
+						PostVisibilityFilter postVisibilityFilter,
+						ElementLoader elementLoader, TemplateContextFactory templateContextFactory,
+						TemplateRenderer templateRenderer,
+						ParserFilter parserFilter, ShortenFilter shortenFilter,
+						RenderFilter renderFilter,
+						LinkedElementRenderFilter linkedElementRenderFilter,
+						PageToadletRegistry pageToadletRegistry, MetricRegistry metricRegistry, Translation translation, L10nFilter l10nFilter,
+						NotificationManager notificationManager, SessionProvider sessionProvider,
+						NewElements newElements) {
 		this.sonePlugin = sonePlugin;
 		this.loaders = loaders;
 		this.listNotificationFilter = listNotificationFilter;
 		this.postVisibilityFilter = postVisibilityFilter;
-		this.replyVisibilityFilter = replyVisibilityFilter;
 		this.elementLoader = elementLoader;
 		this.templateRenderer = templateRenderer;
 		this.parserFilter = parserFilter;
@@ -181,10 +153,7 @@ public class WebInterface implements SessionProvider {
 		this.translation = translation;
 		this.notificationManager = notificationManager;
 		this.sessionProvider = sessionProvider;
-		this.newPostNotification = newPostNotification;
-		this.newReplyNotification = newReplyNotification;
-		this.localPostNotification = localPostNotification;
-		this.localReplyNotification = localReplyNotification;
+		this.newElements = newElements;
 		formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
 
 		this.templateContextFactory = templateContextFactory;
@@ -204,15 +173,6 @@ public class WebInterface implements SessionProvider {
 	@Nonnull
 	public Core getCore() {
 		return sonePlugin.core();
-	}
-
-	/**
-	 * Returns the template context factory of the web interface.
-	 *
-	 * @return The template context factory
-	 */
-	public TemplateContextFactory getTemplateContextFactory() {
-		return templateContextFactory;
 	}
 
 	@Nullable
@@ -258,24 +218,6 @@ public class WebInterface implements SessionProvider {
 		return formPassword;
 	}
 
-	@Nonnull
-	public Collection<Post> getNewPosts(@Nullable Sone currentSone) {
-		Set<Post> allNewPosts = ImmutableSet.<Post> builder()
-				.addAll(newPostNotification.getElements())
-				.addAll(localPostNotification.getElements())
-				.build();
-		return from(allNewPosts).filter(postVisibilityFilter.isVisible(currentSone)).toSet();
-	}
-
-	@Nonnull
-	public Collection<PostReply> getNewReplies(@Nullable Sone currentSone) {
-		Set<PostReply> allNewReplies = ImmutableSet.<PostReply>builder()
-				.addAll(newReplyNotification.getElements())
-				.addAll(localReplyNotification.getElements())
-				.build();
-		return from(allNewReplies).filter(replyVisibilityFilter.isVisible(currentSone)).toSet();
-	}
-
 	//
 	// ACTIONS
 	//
@@ -308,7 +250,7 @@ public class WebInterface implements SessionProvider {
 
 		pageToadletRegistry.addPage(new RedirectPage<FreenetRequest>("", "index.html"));
 		pageToadletRegistry.addPage(new IndexPage(this, loaders, templateRenderer, postVisibilityFilter));
-		pageToadletRegistry.addPage(new NewPage(this, loaders, templateRenderer));
+		pageToadletRegistry.addPage(new NewPage(this, loaders, templateRenderer, newElements));
 		pageToadletRegistry.addPage(new CreateSonePage(this, loaders, templateRenderer));
 		pageToadletRegistry.addPage(new KnownSonesPage(this, loaders, templateRenderer));
 		pageToadletRegistry.addPage(new EditProfilePage(this, loaders, templateRenderer));
@@ -351,19 +293,20 @@ public class WebInterface implements SessionProvider {
 		pageToadletRegistry.addPage(new DismissNotificationPage(this, loaders, templateRenderer));
 		pageToadletRegistry.addPage(new DebugPage(this, loaders, templateRenderer));
 		pageToadletRegistry.addDebugPage(new MetricsPage(this, loaders, templateRenderer, metricRegistry));
+		pageToadletRegistry.addDebugPage(new ElementsPage(this, loaders, templateRenderer, (DefaultElementLoader) elementLoader));
 		pageToadletRegistry.addPage(loaders.<FreenetRequest>loadStaticPage("css/", "/static/css/", "text/css"));
 		pageToadletRegistry.addPage(loaders.<FreenetRequest>loadStaticPage("javascript/", "/static/javascript/", "text/javascript"));
 		pageToadletRegistry.addPage(loaders.<FreenetRequest>loadStaticPage("images/", "/static/images/", "image/png"));
 		pageToadletRegistry.addPage(new TemplatePage<FreenetRequest>("OpenSearch.xml", "application/opensearchdescription+xml", templateContextFactory, openSearchTemplate));
 		pageToadletRegistry.addPage(new GetImagePage(this));
 		pageToadletRegistry.addPage(new GetTranslationAjaxPage(this));
-		pageToadletRegistry.addPage(new GetStatusAjaxPage(this, elementLoader, timeTextConverter, l10nFilter, TimeZone.getDefault()));
-		pageToadletRegistry.addPage(new GetNotificationsAjaxPage(this));
+		pageToadletRegistry.addPage(new GetStatusAjaxPage(this, elementLoader, newElements, timeTextConverter, l10nFilter, TimeZone.getDefault()));
+		pageToadletRegistry.addPage(new GetNotificationsAjaxPage(this, templateContextFactory));
 		pageToadletRegistry.addPage(new DismissNotificationAjaxPage(this));
 		pageToadletRegistry.addPage(new CreatePostAjaxPage(this));
 		pageToadletRegistry.addPage(new CreateReplyAjaxPage(this));
-		pageToadletRegistry.addPage(new GetReplyAjaxPage(this, replyTemplate));
-		pageToadletRegistry.addPage(new GetPostAjaxPage(this, postTemplate));
+		pageToadletRegistry.addPage(new GetReplyAjaxPage(this, templateContextFactory, replyTemplate));
+		pageToadletRegistry.addPage(new GetPostAjaxPage(this, templateContextFactory, postTemplate));
 		pageToadletRegistry.addPage(new GetLinkedElementAjaxPage(this, elementLoader, linkedElementRenderFilter));
 		pageToadletRegistry.addPage(new GetTimesAjaxPage(this, timeTextConverter, l10nFilter, TimeZone.getDefault()));
 		pageToadletRegistry.addPage(new MarkAsKnownAjaxPage(this));

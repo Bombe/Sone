@@ -13,7 +13,7 @@ abstract class LoggedInPage(pageTitleKey: String, webInterface: WebInterface, lo
 		SoneTemplatePage(webInterface, loaders, templateRenderer, pageTitleKey = pageTitleKey, requiresLogin = true) {
 
 	final override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
-		handleRequest(soneRequest, getCurrentSone(soneRequest.toadletContext, false)!!, templateContext)
+		handleRequest(soneRequest, getCurrentSone(soneRequest.toadletContext)!!, templateContext)
 	}
 
 	protected abstract fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext)

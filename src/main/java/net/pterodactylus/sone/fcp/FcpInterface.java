@@ -31,7 +31,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.fcp.event.FcpInterfaceActivatedEvent;

@@ -4,9 +4,9 @@ import net.pterodactylus.sone.fcp.FcpInterface.*
 import net.pterodactylus.util.config.*
 
 /**
- * Loads preferences stored in a [Configuration] into a [Preferences] object.
+ * Loads preferences stored in a [Configuration] into a [DefaultPreferences] object.
  */
-class PreferencesLoader(private val preferences: Preferences) {
+class PreferencesLoader(private val preferences: DefaultPreferences) {
 
 	fun loadFrom(configuration: Configuration) {
 		loadInsertionDelay(configuration)
@@ -18,6 +18,7 @@ class PreferencesLoader(private val preferences: Preferences) {
 		loadFcpInterfaceActive(configuration)
 		loadFcpFullAccessRequired(configuration)
 		loadStrictFiltering(configuration)
+		loadMaxAgeOfPostsToLoad(configuration)
 	}
 
 	private fun loadInsertionDelay(configuration: Configuration) {
@@ -58,6 +59,10 @@ class PreferencesLoader(private val preferences: Preferences) {
 
 	private fun loadStrictFiltering(configuration: Configuration) {
 		preferences.newStrictFiltering = configuration.getBooleanValue("Option/StrictFiltering").getValue(null)
+	}
+
+	private fun loadMaxAgeOfPostsToLoad(configuration: Configuration) {
+		preferences.newMaxAgeOfPostsToLoad = configuration.getIntValue("Option/MaxAgeOfPostsToLoad").getValue(null)
 	}
 
 }
