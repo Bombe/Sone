@@ -9,10 +9,12 @@ tasks:
       ./gradlew clean
   - build: |
       cd sone
-      ./gradlew -x findbugsTest build
+      ./gradlew classes
   - test: |
       cd sone
       ./gradlew test
   - jar: |
       cd sone
       ./gradlew fatJar
+artifacts:
+  - ./sone/build/libs/sone-jar-with-dependencies.jar
